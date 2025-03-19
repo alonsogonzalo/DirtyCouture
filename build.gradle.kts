@@ -24,7 +24,7 @@ kotlin {
 
 // Configuración del plugin 'application' (solo si la app tiene un punto de entrada)
 application {
-    mainClass.set("org.example.MainKt") // Asegúrate de cambiar esto a tu clase principal
+    mainClass.set("com.dirtycouture.MainKt") // Asegúrate de cambiar esto a tu clase principal
 }
 
 // Opcional: Habilitar advertencias en la compilación
