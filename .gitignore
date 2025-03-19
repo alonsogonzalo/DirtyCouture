@@ -4,6 +4,13 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### Kotlin/Java ###
+.kotlin
+*.class
+*.jar
+*.war
+*.ear
+
 ### IntelliJ IDEA ###
 .idea/modules.xml
 .idea/jarRepositories.xml
@@ -16,8 +23,9 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
-### Kotlin ###
-.kotlin
+### Compilation cache ###
+*.log
+logs/
 
 ### Eclipse ###
 .apt_generated
@@ -43,3 +51,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Docker - images & containers ###
+*.tar
