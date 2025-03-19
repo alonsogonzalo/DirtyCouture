@@ -1,4 +1,4 @@
-package org.example
+package com.dirtycouture
 
 fun main() {
     println("Hello World!")
