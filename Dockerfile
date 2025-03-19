@@ -1,21 +1,24 @@
-# Construction
+# Etapa de construcción
 FROM gradle:8.10-jdk23 AS build
 WORKDIR /app
 
-# Copy main files for compilation
+# Copiar archivos necesarios para la compilación
 COPY build.gradle.kts settings.gradle.kts gradle.properties ./
 COPY gradle gradle
 COPY src src
 
-# Compile project
+# Construir el proyecto
 RUN gradle clean installDist
 
-# Optimized final image
+# Etapa final optimizada
 FROM eclipse-temurin:23-jre
 WORKDIR /app
 
-# Copy main files from compilation stage
+# Copiar archivos compilados
 COPY --from=build /app/build/install/DirtyCouture /app/
 
-# Define start command
+# Asegurar permisos de ejecución
+RUN chmod +x /app/bin/DirtyCouture
+
+# Comando para iniciar la aplicación
 CMD ["/app/bin/DirtyCouture"]
