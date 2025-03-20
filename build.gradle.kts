@@ -3,7 +3,7 @@ plugins {
     application //Permite ejecutar con "gradlew run"
 }
 
-group = "org.example"
+group = "com.dirtycouture"
 version = "1.0-SNAPSHOT"
 
 repositories {
