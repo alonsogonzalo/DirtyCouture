@@ -5,8 +5,7 @@
 - **Frontend:** Vue.js 3 + Pinia  
 - **Base de datos:** Supabase (PostgreSQL)  
 - **Servicios externos:** Stripe (pagos), SendGrid (emails)  
-- **Contenedores:** Docker + docker-compose  
-- **CI/CD:** GitHub Actions
+- **CI/CD:** GitHub Actions + Render + Docker
 
 ---
 
@@ -122,7 +121,6 @@ dirtycouture/
 │   ├── deploy-frontend.yml                  # Compila y despliega el frontend automáticamente
 │   └── fullstack-deploy.yml                 # Pipeline combinado para todo el proyecto
 │
-├── docker-compose.yml                       # Orquestador para levantar todo el sistema con Docker
 ├── .env                                     # Variables de entorno comunes (puertos, claves...)
 ├── .gitignore                               # Archivos que no se deben subir al repositorio
 └── README.md                                # Documentación del proyecto (instalación, uso, etc.)
@@ -139,7 +137,7 @@ dirtycouture/
 | Auth           | JWT + Bcrypt             |
 | Pagos          | Stripe                   |
 | Emails         | SendGrid                 |
-| Contenedores   | Docker, Docker Compose   |
+| Contenedores   | Docker                   |
 | CI/CD          | GitHub Actions           |
 
 ---
@@ -158,8 +156,19 @@ Copia el archivo `.env.example` a `.env` y completa tus claves (Stripe, SendGrid
 
 3. Levanta el sistema con Docker
 
+**Crear imagen Docker**
 ```bash
-docker-compose up --build
+docker build -t nombre_imagen
+```
+
+**Listar imágenes**
+```bash
+docker images
+```
+
+**Ejecutar imagen**
+```bash
+docker run -it nombre_imagen
 ```
 
 4. Accede a:
@@ -191,7 +200,7 @@ npm run test
 
 ## 🛠️ Despliegue
 
-El proyecto se despliega automáticamente al hacer merge a `main` usando GitHub Actions y Docker.
+El proyecto se despliega automáticamente al hacer merge a `main` usando GitHub Actions y Docker por medio de Render, una aplicación de despliegue continuo que tomará en tiempo real la información contenida en esta rama.
 
 ---
 
