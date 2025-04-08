@@ -1,0 +1,14 @@
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.17.6.xsd">
+    <generator>
+        <database>
+            <name>org.jooq.meta.postgres.PostgresDatabase</name>
+            <includes>.*</includes>
+            <excludes></excludes>
+            <inputSchema>public</inputSchema>
+        </database>
+        <target>
+            <packageName>com.dirtycouture.database</packageName>
+            <directory>src/main/generated</directory>
+        </target>
+    </generator>
+</configuration>
