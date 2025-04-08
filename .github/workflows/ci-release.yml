@@ -28,12 +28,12 @@ jobs:
       - name: Run tests
         run: ./gradlew test
             
-	  - name: Trigger Render Deploy Hook
-	    env:
+      - name: Trigger Render Deploy Hook
+        env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK}}
-	      DB_URL: ${{secrets.DATABASE_URL }}
-	      DB_USER: ${{ secrets.DB_USER }}
-	      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-	    run: |
-	      curl -X POST "$RENDER_DEPLOY_HOOK"
+	  DB_URL: ${{secrets.DATABASE_URL }}
+	  DB_USER: ${{ secrets.DB_USER }}
+	  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+	  curl -X POST "$RENDER_DEPLOY_HOOK"
 
