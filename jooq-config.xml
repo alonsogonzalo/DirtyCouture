@@ -7,8 +7,8 @@
             <inputSchema>public</inputSchema>
         </database>
         <target>
-            <packageName>com.dirtycouture.database</packageName>
-            <directory>src/main/generated</directory>
+            <packageName>com.dirtycouture.db.generated</packageName>
+            <directory>src/main/kotlin</directory>
         </target>
     </generator>
 </configuration>
