@@ -1,3 +1,16 @@
+import java.util.*;
+
+val env = Properties().apply {
+    val envFile = file(".env")
+    if (envFile.exists()) {
+        envFile.inputStream().use { load(it) }
+    }
+}
+
+val dbUrl = env.getProperty("DB_URL") ?: System.getenv("DB_URL")
+val dbUser = env.getProperty("DB_USER") ?: System.getenv("DB_USER")
+val dbPswd = env.getProperty("DB_PASS") ?: System.getenv("DB_PASS")
+
 plugins {
     kotlin("jvm") version "1.9.22"
     application //Allow execute with "gradlew run"
@@ -66,9 +79,9 @@ jooq {
             jooqConfiguration.apply {
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
-                    url = System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/postgres"
-                    user = System.getenv("DB_USER") ?: "postgres"
-                    password = System.getenv("DB_PASSWORD") ?: "password"
+                    url = dbUrl
+                    user = dbUser
+                    password = dbPswd
                 }
                 generator.apply {
                     name = "org.jooq.codegen.KotlinGenerator"
