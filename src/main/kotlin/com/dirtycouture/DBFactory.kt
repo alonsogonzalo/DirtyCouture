@@ -18,11 +18,11 @@ object DBFactory {
             maximumPoolSize = 10
             isAutoCommit = false
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"
-            valida()
+            //valida()
         }
 
         hikariDataSource = HikariDataSource(config)
-        dslContext = DSL.using(hikariDataSource, org.joow.SQLDialect.POSTGRES)
+        dslContext = DSL.using(hikariDataSource, org.jooq.SQLDialect.POSTGRES)
     }
 
     fun getConnection(): Connection = hikariDataSource.connection
