@@ -33,6 +33,10 @@ dependencies {
     //Ktor serialization
     implementation("io.ktor:ktor-server-content-negotiation:2.3.7")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+    //dotenv
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 
     //HikariCP for connection pooling
     implementation("com.zaxxer:HikariCP:5.1.0")
@@ -69,6 +73,13 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
         jvmTarget = "17"
     }
 }
+
+//Asegura que el JAR que se genera (lo que ejecuta Render) siempre se llame "app.jar"
+tasks.withType<Jar> {
+    archiveBaseName.set("app")
+    archiveVersion.set("") // opcional: evita nombres como app-1.0.jar
+}
+
 
 //DB variables saved on GitHub Secrets, is this necessary?
 jooq {
