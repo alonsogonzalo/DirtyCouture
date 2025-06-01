@@ -1,11 +1,15 @@
-#Imagen base con JDK 17
-FROM eclipse-temurin:17-jdk
+# Etapa de compilación
+FROM gradle:8.5-jdk17 AS builder
 
-#Directorio de trabajo dentro del contenedor
+WORKDIR /app
+COPY . .
+
+RUN gradle clean build
+
+# Etapa de ejecución
+FROM eclipse-temurin:17-jdk
 WORKDIR /app
 
-#Copia el .jar generado por GitHub Actions al contenedor
-COPY build/libs/*.jar app.jar
+COPY --from=builder /app/build/libs/*.jar app.jar
 
-#Comando de arranque
 ENTRYPOINT ["java", "-jar", "app.jar"]

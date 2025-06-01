@@ -21,8 +21,8 @@ jobs:
       - name: Grant execute permission to Gradle wrapper
         run: chmod +x gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Verify build works
+        run: ./gradlew clean build
 
       #Optional: tests already running in main
       - name: Run tests
@@ -31,8 +31,5 @@ jobs:
       - name: Trigger Render Deploy Hook
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK}}
-          DB_URL: ${{secrets.DATABASE_URL }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           curl -X POST "$RENDER_DEPLOY_HOOK"
