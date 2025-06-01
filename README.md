@@ -198,9 +198,11 @@ npm run test
 
 ---
 
-## 🛠️ Despliegue
+## 🚀 Despliegue automático en Render
 
-El proyecto se despliega automáticamente al hacer merge a `main` usando GitHub Actions y Docker por medio de Render, una aplicación de despliegue continuo que tomará en tiempo real la información contenida en esta rama.
+Este proyecto está configurado para desplegar automáticamente la rama `release` en _Render_ usando un **Deploy Hook**.
+
+El workflow `ci-release.yml` se ejecuta cada vez que se hace push a la rama `release`. Si las pruebas pasan correctamente, se lanza un despliegue automático a Render.
 
 ---
 

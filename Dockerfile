@@ -1,24 +1,15 @@
-# Construction
-FROM gradle:8.10-jdk23 AS build
+# Etapa de compilación
+FROM gradle:8.5-jdk17 AS builder
+
+WORKDIR /app
+COPY . .
+
+RUN gradle clean build
+
+# Etapa de ejecución
+FROM eclipse-temurin:17-jdk
 WORKDIR /app
 
-# Copy main files for compilation
-COPY build.gradle.kts settings.gradle.kts gradle.properties ./
-COPY gradle gradle
-COPY src src
+COPY --from=builder /app/build/libs/*.jar app.jar
 
-# Compile project
-RUN gradle clean installDist
-
-# Optimized final image
-FROM eclipse-temurin:23-jre
-WORKDIR /app
-
-# Copy main files from compilation stage
-COPY --from=build /app/build/install/DirtyCouture /app/
-
-# Exec permission
-RUN chmod +x /app/bin/DirtyCouture
-
-# Define start command
-CMD ["/app/bin/DirtyCouture"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
