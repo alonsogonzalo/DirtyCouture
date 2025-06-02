@@ -12,6 +12,7 @@ build/
 *.ear
 
 ### IntelliJ IDEA ###
+.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
@@ -54,3 +55,5 @@ bin/
 
 ### Docker - images & containers ###
 *.tar
+
+.env
