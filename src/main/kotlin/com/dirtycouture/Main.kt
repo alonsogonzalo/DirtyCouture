@@ -1,6 +1,11 @@
 package com.dirtycouture
 
-import com.dirtycouture.routes.healthRoute
+import com.dirtycouture.routes.AuthRoutes
+import com.dirtycouture.routes.CartRoutes
+import com.dirtycouture.routes.NotificationRoutes
+import com.dirtycouture.routes.OrderRoutes
+import com.dirtycouture.routes.PaymentRoutes
+import com.dirtycouture.routes.ProductRoutes
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -26,7 +31,12 @@ fun Application.module() {
     }
 
     routing {
-        healthRoute()
+        AuthRoutes()
+        CartRoutes()
+        NotificationRoutes()
+        OrderRoutes()
+        PaymentRoutes()
+        ProductRoutes()
     }
 
     log.info("Servidor iniciado correctamente en modo ${environment.developmentMode}")
