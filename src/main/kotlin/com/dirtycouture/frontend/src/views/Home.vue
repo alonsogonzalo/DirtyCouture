@@ -1,15 +1,57 @@
 <script setup>
-import Header from "../components/Header.vue";
+import Logo from "../assets/logo.png";
 </script>
 
 <template>
-  <div class="min-h-screen bg-white">
-    <Header />
-    <main class="p-4">
-      <h1 class="text-2xl font-bold text-black mb-4">Nuestros productos</h1>
-      <div class="bg-red-600 h-48 rounded-xl text-center text-white flex items-center justify-center">
-        <p>Aquí irán los productos de la tienda</p>
+  <div class="flex flex-col min-h-screen bg-white">
+
+    <!-- Header -->
+    <header class="bg-black text-white px-6 py-2 flex items-center justify-between max-h-20 overflow-hidden">
+      <div class="w-1/3"></div>
+      <div class="w-1/3 flex justify-center">
+        <!--<img src="/src/assets/logo.png" alt="DirtyCouture Logo" class="h-10 object-contain" />-->
+        <img :src="Logo" alt="DirtyCouture Logo" class="w-60 h-auto object-contain"/>
+      </div>
+      <div class="w-1/3 flex justify-end space-x-4 text-2xl">
+        <i class="fas fa-user"></i>
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="p-6 max-w-6xl mx-auto flex-grow">
+      <h1 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">Nuestros productos</h1>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center">
+          <img src="https://via.placeholder.com/150" class="mb-4 rounded-md" />
+          <h2 class="text-lg font-semibold">Sudadera Negra</h2>
+          <p class="text-sm text-gray-500">€45.00</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center">
+          <img src="https://via.placeholder.com/150" class="mb-4 rounded-md" />
+          <h2 class="text-lg font-semibold">Camiseta Blanca</h2>
+          <p class="text-sm text-gray-500">€25.00</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center">
+          <img src="https://via.placeholder.com/150" class="mb-4 rounded-md" />
+          <h2 class="text-lg font-semibold">Pantalones Cargo</h2>
+          <p class="text-sm text-gray-500">€60.00</p>
+        </div>
       </div>
     </main>
+
+    <!-- Footer -->
+    <footer class="bg-red-600 text-white h-24 w-full rounded-t-xl flex items-center justify-center space-x-12">
+      <span>Diego Alcoba Arias</span>
+      <span>Gonzalo Alonso Olaiz</span>
+      <span>Diego Cisneros Morales</span>
+    </footer>
   </div>
 </template>
+
+<style scoped>
+@import "@fortawesome/fontawesome-free/css/all.min.css";
+</style>
