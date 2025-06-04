@@ -1,18 +1,33 @@
-import {defineStore} from "pinia";
+// src/stores/userStore.ts
+import { defineStore } from 'pinia'
 
-export const useUserStore = defineStore ('user', {
+export const useUserStore = defineStore('user', {
     state: () => ({
-        username: 'Invitado',
-        isLoggedIn: false,
+        token: '' as string,
+        user: null as null | { id: number; email: string; role: string }
     }),
     actions: {
-        login(name: string) {
-            this.username = name;
-            this.isLoggedIn = true;
+        setToken(token: string) {
+            this.token = token
+            localStorage.setItem('token', token)
+        },
+        setUser(user: { id: number; email: string; role: string }) {
+            this.user = user
+            localStorage.setItem('user', JSON.stringify(user))
         },
         logout() {
-            this.username = 'Invitado';
-            this.isLoggedIn = false;
+            this.token = ''
+            this.user = null
+            localStorage.removeItem('token')
+            localStorage.removeItem('user')
         },
-    },
-});
+        initializeFromStorage() {
+            const token = localStorage.getItem('token')
+            const user = localStorage.getItem('user')
+            if (token && user) {
+                this.token = token
+                this.user = JSON.parse(user)
+            }
+        }
+    }
+})
