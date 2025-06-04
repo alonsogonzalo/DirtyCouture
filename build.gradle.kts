@@ -1,4 +1,5 @@
 import java.util.*;
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val env = Properties().apply {
     val envFile = file(".env")
@@ -12,43 +13,67 @@ val dbUser = env.getProperty("DB_USER") ?: System.getenv("DB_USER")
 val dbPswd = env.getProperty("DB_PASS") ?: System.getenv("DB_PASS")
 
 plugins {
-    kotlin("jvm") version "1.9.22"
+    id("org.jetbrains.kotlin.jvm") version "1.9.22"
     application //Allow execute with "gradlew run"
     id("io.ktor.plugin") version "2.3.7"
     id("nu.studer.jooq") version "8.2"
+    kotlin("plugin.serialization") version "1.9.22"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
+
+tasks.withType<ShadowJar> { isZip64 = true }
 
 group = "com.dirtycouture"
 version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
     implementation("io.ktor:ktor-server-core:2.3.7")
     implementation("io.ktor:ktor-server-netty:2.3.7")
     implementation("ch.qos.logback:logback-classic:1.5.13")
 
-    //Ktor serialization
+    // Ktor serialization
     implementation("io.ktor:ktor-server-content-negotiation:2.3.7")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
+    // Ktor Auth
+    implementation("io.ktor:ktor-server-auth:2.3.7")
+    implementation("io.ktor:ktor-server-auth-jwt:2.3.7")
+
+    //Stripe API
+    implementation("com.stripe:stripe-java:24.8.0")
+    implementation("io.ktor:ktor-client-core:2.3.7")
+    implementation("io.ktor:ktor-client-cio:2.3.7")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
+
     //dotenv
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 
-    //HikariCP for connection pooling
+    // Bcrypt para contraseñas
+    implementation("at.favre.lib:bcrypt:0.9.0")
+
+    // JWT (Auth0)
+    implementation("com.auth0:java-jwt:4.5.0")
+
+    // CORS
+    implementation("io.ktor:ktor-server-cors:2.3.7")
+
+    // HikariCP y JOOQ
     implementation("com.zaxxer:HikariCP:5.1.0")
-
-    implementation("org.jooq:jooq:3.17.6") // JOOQ Core
-    implementation("org.jooq:jooq-meta:3.17.6") // Code generation
-    implementation("org.jooq:jooq-codegen:3.17.6") // Kotlin extensions
-
-    implementation("org.postgresql:postgresql:42.7.2") // PostgreSQL driver
+    implementation("org.jooq:jooq:3.17.6")
+    implementation("org.jooq:jooq-meta:3.17.6")
+    implementation("org.jooq:jooq-codegen:3.17.6")
+    implementation("org.postgresql:postgresql:42.7.2")
     jooqGenerator("org.postgresql:postgresql:42.7.2")
 
-    //Tests
+    // Tests
     testImplementation("io.ktor:ktor-server-tests:2.3.7")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:1.9.22")
 }
@@ -115,3 +140,11 @@ jooq {
 }
 
 sourceSets["main"].kotlin.srcDir("supabase/generated/db")
+
+kotlin {
+    sourceSets {
+        val main by getting {
+            kotlin.srcDir("supabase/generated/db")
+        }
+    }
+}
