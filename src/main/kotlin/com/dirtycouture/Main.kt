@@ -26,10 +26,10 @@ fun main(args: Array<String>) {
         ignoreIfMissing = true //Por si ya están definidas en produccion (Github y Render credentials)
     }
 
+    //Prioriza la variable de entorno (Render), si no coge de .env o asigna 8080 directamente
+    val port = System.getenv("PORT")?.toInt() ?: dotenv["PORT"]?.toInt() ?: 8080
 
-    embeddedServer(Netty,
-        port = dotenv["PORT"]?.toInt() ?: 8080,
-        module = Application::module).start(wait = true)
+    embeddedServer(Netty, port, module = Application::module).start(wait = true)
 }
 
 
@@ -39,7 +39,8 @@ fun Application.module() {
 
 
     // 2. Configuramos Stripe
-    // PaymentController.configureStripe()
+    PaymentController.configureStripe()
+
 
     // 3. Variables JWT desde .env
     val jwtSecret = dotenv {
@@ -77,9 +78,6 @@ fun Application.module() {
         install(ContentNegotiation) {
         json()
     }
-    //Stripe API config
-    PaymentController.configureStripe()
-
 
     install(CORS) {
         anyHost() // ⚠️ En producción usa .host("tudominio.com", schemes = listOf("https"))
