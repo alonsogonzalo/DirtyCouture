@@ -47,7 +47,7 @@
           >
             Clear Cart
           </button>
-          <router-link to="/checkout">
+          <router-link to="/checkout/shippingAddress">
             <button class="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700">
               Proceed to Checkout
             </button>
@@ -96,7 +96,7 @@ const totalPrice = computed(() => {
 })
 
 function formatPrice(amount: number): string {
-  return `€${(amount / 100).toFixed(2)}`
+  return `€${amount.toFixed(2)}`
 }
 
 function removeItem(variantId: number) {

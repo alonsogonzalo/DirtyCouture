@@ -3,7 +3,7 @@ import axios from 'axios'
 import { useUserStore } from '../stores/userStore'
 
 const api = axios.create({
-    baseURL: '/',
+    baseURL: 'http://localhost:8080',
 })
 
 api.interceptors.request.use(config => {

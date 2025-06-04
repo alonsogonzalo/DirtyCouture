@@ -7,6 +7,7 @@ import RegisterView from '../views/RegisterView.vue'
 import { useUserStore } from '../stores/userStore'
 import SettingsView from "../views/SettingsView.vue";
 import CartView from "../views/CartView.vue";
+import ShippingAddressView from "../views/ShippingAddressView.vue";
 
 const routes = [
     {
@@ -39,7 +40,12 @@ const routes = [
         path: '/cart',
         name: 'cart',
         component: CartView
-    }
+    },
+    {
+        path: '/checkout/shippingAddress',
+        name: 'shippingAddress',
+        component: ShippingAddressView
+    },
 ]
 
 const router = createRouter({
