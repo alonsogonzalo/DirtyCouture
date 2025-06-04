@@ -132,13 +132,13 @@ dirtycouture/
 | Parte          | Tecnología               |
 |----------------|--------------------------|
 | Frontend       | Vue 3, Vite, Pinia, Axios|
-| Backend        | Ktor, Kotlin, Exposed    |
+| Backend        | Ktor, Kotlin, jOOQ       |
 | Base de datos  | Supabase (PostgreSQL)    |
 | Auth           | JWT + Bcrypt             |
 | Pagos          | Stripe                   |
 | Emails         | SendGrid                 |
 | Contenedores   | Docker                   |
-| CI/CD          | GitHub Actions           |
+| CI/CD          | GitHub Actions, Render   |
 
 ---
 
