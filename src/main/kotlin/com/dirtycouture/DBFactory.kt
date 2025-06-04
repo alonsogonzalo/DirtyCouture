@@ -29,7 +29,7 @@ object DBFactory {
             this.username = user
             this.password = password
             maximumPoolSize = 10
-            isAutoCommit = false
+            isAutoCommit = true
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"
             validate()
         }
