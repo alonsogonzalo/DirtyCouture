@@ -19,6 +19,10 @@
       <button @click="saveChanges" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded">
         Guardar cambios
       </button>
+    <div>
+  </div>
+
+        <router-link to="/" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">Volver al incio </router-link>
 
       <p v-if="successMessage" class="text-green-500 mt-4 text-center">{{ successMessage }}</p>
     </div>
