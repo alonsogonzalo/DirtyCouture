@@ -1,11 +1,7 @@
 package com.dirtycouture
 
-import com.dirtycouture.routes.authRoutes
-import com.dirtycouture.routes.cartRoutes
-import com.dirtycouture.routes.notificationRoutes
-import com.dirtycouture.routes.orderRoutes
-import com.dirtycouture.routes.paymentRoutes
-import com.dirtycouture.routes.productRoutes
+import com.dirtycouture.controllers.PaymentController
+import com.dirtycouture.routes.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -26,17 +22,28 @@ fun main(args: Array<String>) {
 fun Application.module() {
     DBFactory.init()
 
+    //Stripe API config
+    PaymentController.configureStripe()
+
     install(ContentNegotiation) {
         json()
     }
 
+
     routing {
+        //Estas rutas utilizan autenticación JWT
+        //authenticate("auth-jwt") {
         authRoutes()
         cartRoutes()
         notificationRoutes()
         orderRoutes()
         paymentRoutes()
         productRoutes()
+        webhookRoutes()
+        //}
+
+        //Estas rutas no utilizan JWT
+        webhookRoutes()
     }
 
     log.info("Servidor iniciado correctamente en modo ${environment.developmentMode}")
