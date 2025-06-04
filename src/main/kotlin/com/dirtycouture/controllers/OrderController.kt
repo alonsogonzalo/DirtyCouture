@@ -108,18 +108,27 @@ object OrderController {
                 .from(Payments.PAYMENTS)
                 .where(Payments.PAYMENTS.ORDER_ID.`in`(orderIds))
                 .fetch()
-                .associate { it[Payments.PAYMENTS.ORDER_ID]!! to it[Payments.PAYMENTS.STATUS]!! }
+                .associate { row ->
+                    val orderId = row[Payments.PAYMENTS.ORDER_ID]
+                    val status = row[Payments.PAYMENTS.STATUS]
+                    (if (orderId != null && status != null) orderId to status else null)!!
+                }
+
+
+            if (payments.isEmpty()) {
+                call.application.environment.log.warn("No payment data found for orders: $orderIds")
+            }
 
             val result = orders.map { order ->
                 val items = itemsMap[order.id]?.map { record ->
                     OrderItemResponse(
-                        variantId = record[OrderItems.ORDER_ITEMS.PRODUCT_VARIANT_ID]!!,
-                        quantity = record[OrderItems.ORDER_ITEMS.QUANTITY]!!,
-                        price = record[OrderItems.ORDER_ITEMS.PRICE]!!,
-                        size = record[ProductVariants.PRODUCT_VARIANTS.SIZE]!!.toString(),
-                        color = record[ProductVariants.PRODUCT_VARIANTS.COLOR]!!,
-                        imageUrl = record[ProductVariants.PRODUCT_VARIANTS.IMAGE_URL]!!,
-                        productName = record[Products.PRODUCTS.NAME]!!
+                        variantId = record[OrderItems.ORDER_ITEMS.PRODUCT_VARIANT_ID] ?: 0L,
+                        quantity = record[OrderItems.ORDER_ITEMS.QUANTITY] ?: 0L,
+                        price = record[OrderItems.ORDER_ITEMS.PRICE] ?: 0.0,
+                        size = record[ProductVariants.PRODUCT_VARIANTS.SIZE]?.toString() ?: "N/A",
+                        color = record[ProductVariants.PRODUCT_VARIANTS.COLOR] ?: "N/A",
+                        imageUrl = record[ProductVariants.PRODUCT_VARIANTS.IMAGE_URL] ?: "",
+                        productName = record[Products.PRODUCTS.NAME] ?: "N/A"
                     )
                 } ?: emptyList()
 
