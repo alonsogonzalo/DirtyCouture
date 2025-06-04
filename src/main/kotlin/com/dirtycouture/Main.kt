@@ -26,10 +26,10 @@ fun main(args: Array<String>) {
         ignoreIfMissing = true //Por si ya están definidas en produccion (Github y Render credentials)
     }
 
+    //Prioriza la variable de entorno (Render), si no coge de .env o asigna 8080 directamente
+    val port = System.getenv("PORT")?.toInt() ?: dotenv["PORT"]?.toInt() ?: 8080
 
-    embeddedServer(Netty,
-        port = dotenv["PORT"]?.toInt() ?: 8080,
-        module = Application::module).start(wait = true)
+    embeddedServer(Netty, port, module = Application::module).start(wait = true)
 }
 
 
