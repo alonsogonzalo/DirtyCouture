@@ -139,4 +139,46 @@ object ShippingController {
             call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "Failed to save address"))
         }
     }
+    /**
+     * DELETE /api/shipping/{addressId}
+     * Borra la dirección con id = addressId, pero solo si pertenece al usuario autenticado.
+     */
+    suspend fun deleteAddress(call: ApplicationCall) {
+        // 1) Recuperar userId del JWT
+        val principal = call.principal<JWTPrincipal>()
+            ?: return call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Not authenticated"))
+        val userId = principal.payload.subject?.toLongOrNull()
+            ?: return call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid JWT subject"))
+
+        // 2) Recuperar el addressId de la ruta
+        val addressId = call.parameters["addressId"]?.toLongOrNull()
+            ?: return call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing or invalid addressId"))
+
+        try {
+            val dsl = DBFactory.dslContext
+
+            // 3) Primero comprobamos que esa dirección existe y pertenece a este userId
+            val existing = dsl.selectFrom(ShippingAddresses.SHIPPING_ADDRESSES)
+                .where(
+                    ShippingAddresses.SHIPPING_ADDRESSES.ID.eq(addressId)
+                        .and(ShippingAddresses.SHIPPING_ADDRESSES.USER_ID.eq(userId))
+                )
+                .fetchOneInto(ShippingPojo::class.java)
+
+            if (existing == null) {
+                // O no existe o no pertenece al usuario
+                return call.respond(HttpStatusCode.NotFound, mapOf("error" to "Address not found"))
+            }
+
+            // 4) Si existe y es de este usuario, la borramos
+            dsl.deleteFrom(ShippingAddresses.SHIPPING_ADDRESSES)
+                .where(ShippingAddresses.SHIPPING_ADDRESSES.ID.eq(addressId))
+                .execute()
+
+            call.respond(HttpStatusCode.OK, mapOf("message" to "Address deleted"))
+        } catch (ex: Exception) {
+            call.application.log.error("Error en deleteAddress para addressId=$addressId userId=$userId", ex)
+            call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "Failed to delete address"))
+        }
+    }
 }

@@ -2,7 +2,6 @@ package com.dirtycouture.routes
 
 import io.ktor.server.routing.*
 import io.ktor.server.application.*
-import io.ktor.server.auth.jwt.*
 import com.dirtycouture.controllers.ShippingController
 import io.ktor.server.auth.*
 
@@ -13,10 +12,14 @@ fun Route.shippingRoutes() {
             ShippingController.getUserAddresses(call)
         }
 
-        // POST /api/shipping  (requiere JWT)
         authenticate("auth-jwt") {
+            // POST /api/shipping
             post {
                 ShippingController.addAddress(call)
+            }
+            // DELETE /api/shipping/{addressId}
+            delete("{addressId}") {
+                ShippingController.deleteAddress(call)
             }
         }
     }
