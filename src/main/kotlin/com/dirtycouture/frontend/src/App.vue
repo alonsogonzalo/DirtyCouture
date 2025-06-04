@@ -1,8 +1,7 @@
 <template>
-  <div class="min-h-screen bg-black-100 text-black">
-    <router-view />
-  </div>
+  <Home />
 </template>
 
-<script setup lang="ts">
+<script setup>
+import Home from './views/Home.vue'
 </script>

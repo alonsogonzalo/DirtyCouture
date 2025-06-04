@@ -12,7 +12,7 @@ val dbUser = env.getProperty("DB_USER") ?: System.getenv("DB_USER")
 val dbPswd = env.getProperty("DB_PASS") ?: System.getenv("DB_PASS")
 
 plugins {
-    kotlin("jvm") version "1.9.22"
+    id("org.jetbrains.kotlin.jvm") version "1.9.22"
     application //Allow execute with "gradlew run"
     id("io.ktor.plugin") version "2.3.7"
     id("nu.studer.jooq") version "8.2"
@@ -23,9 +23,11 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
     implementation("io.ktor:ktor-server-core:2.3.7")
     implementation("io.ktor:ktor-server-netty:2.3.7")
     implementation("ch.qos.logback:logback-classic:1.5.13")
