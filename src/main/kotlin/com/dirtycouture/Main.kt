@@ -1,5 +1,6 @@
 package com.dirtycouture
 
+import com.dirtycouture.controllers.PaymentController
 import com.dirtycouture.routes.authRoutes
 import com.dirtycouture.routes.cartRoutes
 import com.dirtycouture.routes.notificationRoutes
@@ -13,6 +14,12 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.routing.*
 import io.github.cdimascio.dotenv.dotenv
+import io.ktor.http.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import io.ktor.server.response.*
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 
 fun main(args: Array<String>) {
     //Carga .env (credenciales DB) antes de iniciar ktor
@@ -20,23 +27,72 @@ fun main(args: Array<String>) {
         ignoreIfMissing = true //Por si ya están definidas en produccion (Github y Render credentials)
     }
 
-    embeddedServer(Netty, port = dotenv["PORT"]?.toInt() ?: 8080, module = Application::module).start(wait = true)
+    embeddedServer(Netty,
+        port = dotenv["PORT"]?.toInt() ?: 8080,
+        module = Application::module).start(wait = true)
 }
 
+
 fun Application.module() {
+    // 1. Inicializamos la BD (HikariCP + jOOQ)
     DBFactory.init()
 
+    // 2. Configuramos Stripe
+    // PaymentController.configureStripe()
+
+    // 3. Variables JWT desde .env
+    val jwtSecret = dotenv {
+        ignoreIfMissing = true
+    }["JWT_SECRET"] ?: throw IllegalStateException("JWT_SECRET no está definido")
+    val jwtIssuer = dotenv {
+        ignoreIfMissing = true
+    }["JWT_ISSUER"] ?: "dirtycouture.io"
+
+    // 4. Instalamos el plugin de Authentication con JWT
+    install(Authentication) {
+        jwt("auth-jwt") {
+            realm = "dirtycouture"
+            verifier(
+                JWT
+                    .require(Algorithm.HMAC256(jwtSecret))
+                    .withIssuer(jwtIssuer)
+                    .build()
+            )
+            validate { credential ->
+                // Si el token contiene el claim "sub" (userId) y no está expirado, devolvemos un JWTPrincipal
+                if (credential.payload.subject != null) {
+                    JWTPrincipal(credential.payload)
+                } else {
+                    null
+                }
+            }
+            challenge { _, _ ->
+                call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Token inválido o expirado"))
+            }
+        }
+    }
+
+    // 5. Instalamos ContentNegotiation (JSON)
     install(ContentNegotiation) {
         json()
     }
 
+    // 6. Rutas: separamos públicas y protegidas
     routing {
-        authRoutes()
-        cartRoutes()
-        notificationRoutes()
-        orderRoutes()
-        paymentRoutes()
-        productRoutes()
+        // Rutas públicas (no requieren token)
+        authRoutes()    // /auth/register y /auth/login
+        productRoutes() // /api/products, /api/products/{id}/variants
+
+        // Rutas protegidas (requieren JWT válido)
+        authenticate("auth-jwt") {
+            cartRoutes()         // /api/cart/...
+            orderRoutes()        // /api/orders/...
+            paymentRoutes()      // /api/payments/...
+            notificationRoutes() // /api/notifications/...
+        }
+
+        // Webhook de Stripe no requiere JWT
+       // webhookRoutes()
     }
 
     log.info("Servidor iniciado correctamente en modo ${environment.developmentMode}")
