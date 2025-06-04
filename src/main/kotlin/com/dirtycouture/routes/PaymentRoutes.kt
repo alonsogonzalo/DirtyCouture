@@ -6,6 +6,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.application.*
 import com.dirtycouture.controllers.PaymentController
 import io.ktor.server.auth.*
+import org.jetbrains.kotlin.de.undercouch.gradle.tasks.download.org.apache.http.client.methods.RequestBuilder
 
 /**
  * Registrar las rutas de pago.
@@ -20,7 +21,8 @@ fun Route.paymentRoutes() {
                 PaymentController.createOrderAndCheckoutSession(call)
             }
         }
-        // Si luego añades webhook de Stripe, lo pones aquí (sin authenticate)
-        // post("/webhook") { PaymentController.webhook(call) }
+        post("/webhook") {
+            PaymentController.handleStripeWebhook(call)
+        }
     }
 }
