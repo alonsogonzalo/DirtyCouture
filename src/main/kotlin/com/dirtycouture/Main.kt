@@ -1,12 +1,7 @@
 package com.dirtycouture
 
 import com.dirtycouture.controllers.PaymentController
-import com.dirtycouture.routes.authRoutes
-import com.dirtycouture.routes.cartRoutes
-import com.dirtycouture.routes.notificationRoutes
-import com.dirtycouture.routes.orderRoutes
-import com.dirtycouture.routes.paymentRoutes
-import com.dirtycouture.routes.productRoutes
+import com.dirtycouture.routes.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -38,6 +33,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
     // 1. Inicializamos la BD (HikariCP + jOOQ)
     DBFactory.init()
+
 
     // 2. Configuramos Stripe
     // PaymentController.configureStripe()
@@ -75,9 +71,12 @@ fun Application.module() {
     }
 
     // 5. Instalamos ContentNegotiation (JSON)
-    install(ContentNegotiation) {
+        install(ContentNegotiation) {
         json()
     }
+    //Stripe API config
+    PaymentController.configureStripe()
+
 
     install(CORS) {
         anyHost() // ⚠️ En producción usa .host("tudominio.com", schemes = listOf("https"))
@@ -99,14 +98,16 @@ fun Application.module() {
 
         // Rutas protegidas (requieren JWT válido)
         authenticate("auth-jwt") {
-            cartRoutes()         // /api/cart/...
-            orderRoutes()        // /api/orders/...
-            paymentRoutes()      // /api/payments/...
-            notificationRoutes() // /api/notifications/...
+          cartRoutes()
+          notificationRoutes()
+          orderRoutes()
+          paymentRoutes()
+          webhookRoutes()
         }
 
         // Webhook de Stripe no requiere JWT
        // webhookRoutes()
+
     }
 
     log.info("Servidor iniciado correctamente en modo ${environment.developmentMode}")

@@ -6,9 +6,15 @@ import com.dirtycouture.controllers.PaymentController
 import io.ktor.server.application.*
 
 fun Route.paymentRoutes() {
-    route("/api/payments") {
+    route("/api/payment") {
+        post("/create-checkout-session") {
+            PaymentController.createCheckoutSession(call)
+        }
+    }
+
+    /*route("/api/payments") {
         post("{idOrder}"){PaymentController.processOrderToPay(call)}
         post("/webhook"){ PaymentController.webhook(call)}
 
-    }
+    }*/
 }

@@ -40,7 +40,14 @@ dependencies {
     implementation("io.ktor:ktor-server-auth:2.3.7")
     implementation("io.ktor:ktor-server-auth-jwt:2.3.7")
 
-    // dotenv
+    //Stripe API
+    implementation("com.stripe:stripe-java:24.8.0")
+    implementation("io.ktor:ktor-client-core:2.3.7")
+    implementation("io.ktor:ktor-client-cio:2.3.7")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
+
+    //dotenv
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 
     // Bcrypt para contraseñas
