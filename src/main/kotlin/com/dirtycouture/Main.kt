@@ -17,6 +17,8 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.http.*
+import io.ktor.server.http.content.*
+import io.ktor.server.request.*
 
 fun main(args: Array<String>) {
     //Carga .env (credenciales DB) antes de iniciar ktor
@@ -93,37 +95,25 @@ fun Application.module() {
 
     // 6. Rutas: separamos públicas y protegidas
     routing {
+        // Prueba básica
         get("/ping") {
             call.respondText("pong")
         }
 
-        // Rutas estáticas y SPA
-        staticResources("/", "frontend.dist")
-
-        get("{...}") {
-            call.respondText(
-                this::class.java.classLoader.getResource("frontend.dist/index.html")!!.readText(),
-                ContentType.Text.Html
-            )
-        }
-
-        // Rutas públicas
-        authRoutes()    // /auth/register y /auth/login
-        productRoutes() // /api/products, /api/products/{id}/variants
-
-        // Webhook de Stripe (no requiere autenticación)
-        webhookRoutes()
+        // Rutas públicas de la API
+        authRoutes()       // /auth/register, /auth/login
+        productRoutes()    // /api/products, /api/products/{id}/variants
+        webhookRoutes()    // /api/payments/webhook (Stripe)
 
         // Rutas protegidas con JWT
         authenticate("auth-jwt") {
-            cartRoutes()
-            notificationRoutes()
-            orderRoutes()
-            paymentRoutes()
+            cartRoutes()         // /api/cart/…
+            notificationRoutes() // /api/notifications/…
+            orderRoutes()        // /api/orders/…
+            paymentRoutes()      // /api/payments/…
         }
     }
 
-    }
 
     log.info("Servidor iniciado correctamente en modo ${environment.developmentMode}")
 }

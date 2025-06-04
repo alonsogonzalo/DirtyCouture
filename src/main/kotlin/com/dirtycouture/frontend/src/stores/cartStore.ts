@@ -1,42 +1,69 @@
-// stores/cartStore.js
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import api from '../services/api' // ← instancia de Axios con interceptor
 
 export const useCartStore = defineStore('cart', {
     state: () => ({
-        cartItems: [],
+        // Siempre arranca como array vacío
+        cartItems: [] as any[]
     }),
     actions: {
-        async fetchCart(userId) {
+        /**
+         * Obtiene el carrito de un usuario.
+         * Llama a GET /api/cart/{userId} (Bearer token dentro de api).
+         */
+        async fetchCart(userId: number) {
             try {
-                const response = await axios.get(`/api/cart/${userId}`)
-                this.cartItems = response.data
-            } catch (error) {
-                console.error('Error fetching cart:', error)
+                const response = await api.get(`/api/cart/${userId}`)
+                console.log('RESPUESTA CART:', response.data) // <-- Depuración
+                this.cartItems = Array.isArray(response.data) ? response.data : []
+            } catch (err) {
+                console.error('Error fetching cart:', err)
+                this.cartItems = []
             }
         },
-        async addToCart(userId, variantId, quantity = 1) {
+
+        /**
+         * Elimina un item del carrito.
+         * Llama a DELETE /api/cart/delete/{userId}/{variantId}.
+         */
+        async removeFromCart(userId: number, variantId: number) {
             try {
-                await axios.post('/api/cart', {
-                    userId,
-                    variantId,
-                    quantity,
-                })
+                await api.delete(`/api/cart/delete/${userId}/${variantId}`)
                 await this.fetchCart(userId)
-            } catch (error) {
-                console.error('Error adding to cart:', error)
+            } catch (err) {
+                console.error('Error removing from cart:', err)
             }
         },
-        async removeFromCart(userId, variantId) {
+
+        /**
+         * Vacia todo el carrito.
+         * Llama a DELETE /api/cart/clear/{userId}.
+         */
+        async clearCartFromBackend(userId: number) {
             try {
-                await axios.delete(`/api/cart/${userId}/${variantId}`)
+                await api.delete(`/api/cart/clear/${userId}`)
                 await this.fetchCart(userId)
-            } catch (error) {
-                console.error('Error removing from cart:', error)
+            } catch (err) {
+                console.error('Error clearing cart:', err)
             }
         },
+
+        /**
+         * Añade un variant al carrito.
+         * Llama a POST /api/cart/add/{userId}/{variantId}.
+         */
+        async addToCart(userId: number, variantId: number) {
+            try {
+                await api.post(`/api/cart/add/${userId}/${variantId}`)
+                await this.fetchCart(userId)
+            } catch (err) {
+                console.error('Error adding to cart:', err)
+            }
+        },
+
+        // Limpia localmente (no borra en backend)
         clearCart() {
             this.cartItems = []
-        },
-    },
+        }
+    }
 })

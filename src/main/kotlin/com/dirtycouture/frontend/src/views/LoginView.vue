@@ -26,19 +26,23 @@
 
         <button
             type="submit"
-            class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition"
+            :disabled="loading"
+            class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
         >
-          Entrar
+          {{ loading ? 'Entrando...' : 'Entrar' }}
         </button>
-        <div>
-        <router-link to="/" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">Volver al incio </router-link>
-          </div>
+
+        <router-link
+            to="/"
+            class="block w-full text-center bg-gray-300 text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-400 transition"
+        >
+          Volver al inicio
+        </router-link>
       </form>
 
       <p class="text-sm text-center text-gray-600">
         ¿No tienes cuenta?
         <router-link to="/register" class="text-blue-600 hover:underline">Regístrate aquí</router-link>
-
       </p>
 
       <p v-if="error" class="text-red-500 text-center text-sm">{{ error }}</p>
@@ -54,11 +58,14 @@ import { useUserStore } from '../stores/userStore'
 const email = ref('')
 const password = ref('')
 const error = ref('')
+const loading = ref(false)
 const router = useRouter()
 const userStore = useUserStore()
 
 const handleLogin = async () => {
   error.value = ''
+  loading.value = true
+
   try {
     const response = await fetch('http://localhost:8080/auth/login', {
       method: 'POST',
@@ -67,18 +74,20 @@ const handleLogin = async () => {
     })
 
     const result = await response.json()
+    console.log('Login response:', result)
 
     if (!response.ok) {
-      throw new Error(result.error || 'Login failed')
+      throw new Error(result.error || 'Login fallido')
     }
 
     userStore.setUser(result.user)
     userStore.setToken(result.token)
-    localStorage.setItem('token', result.token)
-    localStorage.setItem('user', JSON.stringify(result.user))
-    router.push('/')
+
+    router.push('/') // Redirigir al home, o a /dashboard si lo prefieres
   } catch (err: any) {
     error.value = err.message
+  } finally {
+    loading.value = false
   }
 }
 </script>
