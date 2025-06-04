@@ -17,9 +17,10 @@ import io.ktor.server.response.*
 import kotlinx.serialization.Serializable
 import org.jooq.impl.DSL
 import java.math.BigDecimal
+import com.stripe.net.Webhook
+import com.dirtycouture.db.generated.tables.Payments
 import com.dirtycouture.db.generated.enums.PaymentStatus
-import io.github.cdimascio.dotenv.Dotenv
-import io.github.cdimascio.dotenv.dotenv
+
 
 enum class OrderStatus(val code: Short) {
     PENDING(0),
@@ -41,7 +42,7 @@ object PaymentController {
             ignoreIfMissing = true
         }
         val key = dotenv["STRIPE_SECRET_KEY"]
-        println("✅ Stripe configurado con clave: $key")
+        println("Stripe configurado con clave: $key")
         Stripe.apiKey = key
     }
 
@@ -149,4 +150,54 @@ object PaymentController {
             CreateOrderResponse(orderId = orderId, stripeUrl = session.url!!)
         )
     }
+
+    suspend fun handleStripeWebhook(call: ApplicationCall) {
+        val payload = call.receiveText()
+        val sigHeader = call.request.headers["Stripe-Signature"]
+        val endpointSecret = System.getenv("STRIPE_WEBHOOK_SECRET")
+
+        if (sigHeader == null || endpointSecret == null) {
+            call.respond(HttpStatusCode.BadRequest, "Missing signature or secret")
+            return
+        }
+
+        val event = try {
+            Webhook.constructEvent(payload, sigHeader, endpointSecret)
+        } catch (e: Exception) {
+            call.application.environment.log.error("Webhook error: ${e.message}")
+            call.respond(HttpStatusCode.BadRequest, "Invalid payload")
+            return
+        }
+
+        if (event.type == "checkout.session.completed") {
+            val session = event.dataObjectDeserializer.`object`.orElse(null) as? Session
+            if (session != null) {
+                val dsl = DBFactory.dslContext
+
+                val orderId = session.metadata?.get("orderId")?.toLongOrNull()
+                val paymentId = session.id
+                val amountTotal = session.amountTotal?.div(100.0) ?: 0.0
+                val paymentMethod = session.paymentMethodTypes.firstOrNull() ?: "unknown"
+
+                if (orderId != null) {
+                    // Inserta el payment asociado a la orden
+                    dsl.insertInto(Payments.PAYMENTS)
+                        .set(Payments.PAYMENTS.ORDER_ID, orderId)
+                        .set(Payments.PAYMENTS.STRIPE_PAYMENT_ID, paymentId)
+                        .set(Payments.PAYMENTS.AMOUNT, amountTotal)
+                        .set(Payments.PAYMENTS.STATUS, PaymentStatus.Suceeded)
+                        .set(Payments.PAYMENTS.PAYMENT_METHOD, paymentMethod)
+                        .execute()
+
+                    dsl.update(Orders.ORDERS)
+                        .set(Orders.ORDERS.STATUS, OrderStatus.PAID.code)
+                        .where(Orders.ORDERS.ID.eq(orderId))
+                        .execute()
+                }
+            }
+        }
+
+        call.respond(HttpStatusCode.OK)
+    }
+
 }

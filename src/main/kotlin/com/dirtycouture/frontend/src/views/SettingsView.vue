@@ -45,7 +45,6 @@
     <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-3xl">
       <h2 class="text-xl font-semibold mb-4">Tus direcciones guardadas</h2>
 
-      <!-- Estado de carga / error -->
       <div v-if="addressStore.loading" class="text-center text-gray-500 mb-4">
         Cargando direcciones…
       </div>
@@ -53,7 +52,6 @@
         {{ addressStore.error }}
       </div>
 
-      <!-- Lista de direcciones -->
       <ul v-if="!addressStore.loading && addressStore.addresses.length > 0" class="space-y-4">
         <li
             v-for="addr in addressStore.addresses"
@@ -75,9 +73,37 @@
         </li>
       </ul>
 
-      <!-- Mensaje si no hay direcciones -->
       <div v-if="!addressStore.loading && addressStore.addresses.length === 0" class="text-gray-500">
         No tienes direcciones guardadas.
+      </div>
+    </div>
+
+    <!-- Bloque de pedidos -->
+    <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-3xl">
+      <h2 class="text-xl font-semibold mb-4">Tus pedidos</h2>
+
+      <div v-if="orders.length === 0" class="text-gray-500 text-center">No tienes pedidos realizados.</div>
+
+      <div v-for="order in orders" :key="order.id" class="border rounded-lg mb-4">
+        <div class="p-4 flex justify-between items-center cursor-pointer" @click="toggleOrder(order.id)">
+          <div>
+            <p><strong>Pedido #{{ order.id }}</strong> – Total: €{{ order.total.toFixed(2) }}</p>
+            <p class="text-sm">Estado: {{ mapStatus(order.status) }} – Pago: {{ mapPayment(order.paymentStatus) }}</p>
+            <p class="text-xs text-gray-400">Fecha: {{ formatDate(order.createdAt) }}</p>
+          </div>
+          <span>{{ expandedOrderId === order.id ? '▲' : '▼' }}</span>
+        </div>
+
+        <div v-if="expandedOrderId === order.id" class="px-4 pb-4">
+          <div v-for="item in order.items" :key="item.variantId" class="flex items-center py-2 border-t">
+            <img :src="item.imageUrl" alt="item" class="w-16 h-16 object-cover rounded mr-4" />
+            <div>
+              <p class="font-semibold">{{ item.productName }}</p>
+              <p class="text-sm">Talla: {{ item.size }}, Color: {{ item.color }}</p>
+              <p class="text-sm">Cantidad: {{ item.quantity }} – Precio: €{{ item.price.toFixed(2) }}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -88,73 +114,53 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/userStore'
 import { useAddressStore } from '../stores/addressStore'
+import axios from 'axios'
 
-// Instanciamos los stores
 const router = useRouter()
 const userStore = useUserStore()
 const addressStore = useAddressStore()
 
-// Campos para editar usuario
 const email = ref('')
 const role = ref('User')
 const updatingUser = ref(false)
 const successMessage = ref('')
 
-// Obtenemos el usuario actual de userStore
+const orders = ref<any[]>([])
+const expandedOrderId = ref<number | null>(null)
+
 const user = computed(() => userStore.user)
 
-// Al montar, rellenamos los campos de usuario y cargamos direcciones
-onMounted(() => {
+onMounted(async () => {
   if (!userStore.user) {
-    // Si no hay usuario logueado, redirigimos al login
     router.push('/login')
     return
   }
-  // Inicializamos los campos de usuario
   email.value = userStore.user.email
   role.value = userStore.user.role
 
-  // Cargamos direcciones para este usuario
   addressStore.fetchAddresses(userStore.user.id)
+  await fetchOrders()
 })
 
-/**
- * Función que se ejecuta al enviar el formulario de usuario:
- * Llama a PUT /api/users/{userId} para actualizar email/role.
- * Luego actualiza userStore y muestra un mensaje de éxito.
- */
 async function handleUpdateUser() {
   if (!userStore.user) return
   updatingUser.value = true
   successMessage.value = ''
 
   try {
-    // Suponemos que existe en el backend un endpoint:
-    // PUT /api/users/{userId} { email, role }
     const response = await fetch(`http://localhost:8080/api/users/${userStore.user.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${userStore.token}`
       },
-      body: JSON.stringify({
-        email: email.value,
-        role: role.value
-      })
+      body: JSON.stringify({ email: email.value, role: role.value })
     })
 
     const result = await response.json()
-    if (!response.ok) {
-      throw new Error(result.error || 'Error al actualizar usuario')
-    }
+    if (!response.ok) throw new Error(result.error || 'Error al actualizar usuario')
 
-    // Actualizamos el store con los datos nuevos
-    userStore.setUser({
-      id: userStore.user.id,
-      email: result.email,
-      role: result.role
-    })
-
+    userStore.setUser({ id: userStore.user.id, email: result.email, role: result.role })
     successMessage.value = 'Datos actualizados correctamente.'
     setTimeout(() => (successMessage.value = ''), 3000)
   } catch (err: any) {
@@ -166,37 +172,49 @@ async function handleUpdateUser() {
   }
 }
 
-/**
- * Función que formatea una fecha ISO para mostrar día/mes/año y hora.
- */
-function formatDate(isoString: string): string {
+async function fetchOrders() {
   try {
-    const date = new Date(isoString)
-    const d = date.getDate().toString().padStart(2, '0')
-    const m = (date.getMonth() + 1).toString().padStart(2, '0')
-    const y = date.getFullYear()
-    const hh = date.getHours().toString().padStart(2, '0')
-    const mm = date.getMinutes().toString().padStart(2, '0')
-    return `${d}/${m}/${y} ${hh}:${mm}`
-  } catch {
-    return isoString
+    const res = await axios.get('http://localhost:8080/api/orders/user', {
+      headers: {
+        Authorization: `Bearer ${userStore.token}`
+      }
+    })
+    orders.value = res.data
+  } catch (err) {
+    console.error('Error al cargar pedidos:', err)
   }
 }
 
-/**
- * Pide confirmación y luego invoca a addressStore.deleteAddress.
- */
-async function confirmDelete(addressId: number) {
+function toggleOrder(id: number) {
+  expandedOrderId.value = expandedOrderId.value === id ? null : id
+}
+
+function formatDate(iso: string): string {
+  try {
+    const d = new Date(iso)
+    return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
+  } catch {
+    return iso
+  }
+}
+
+function confirmDelete(addressId: number) {
   if (!userStore.user) return
   const ok = confirm('¿Estás seguro de que deseas borrar esta dirección?')
   if (!ok) return
+  addressStore.deleteAddress(addressId, userStore.user.id)
+}
 
-  await addressStore.deleteAddress(addressId, userStore.user.id)
+function mapStatus(code: number): string {
+  return ['Pendiente', 'Pagado', 'Enviado', 'Cancelado'][code] ?? 'Desconocido'
+}
+
+function mapPayment(status: string): string {
+  return status === 'completed' ? 'Completado' : 'Pendiente'
 }
 </script>
 
 <style scoped>
-/* Ajustes menores para alinear y espaciar */
 .min-h-screen {
   min-height: calc(100vh - 2rem);
 }

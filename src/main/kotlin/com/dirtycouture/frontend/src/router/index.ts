@@ -8,6 +8,8 @@ import { useUserStore } from '../stores/userStore'
 import SettingsView from "../views/SettingsView.vue";
 import CartView from "../views/CartView.vue";
 import ShippingAddressView from "../views/ShippingAddressView.vue";
+import AcceptPaymentView from "../views/AcceptPaymentView.vue";
+import CancelPaymentView from "../views/CancelPaymentView.vue";
 
 const routes = [
     {
@@ -46,6 +48,16 @@ const routes = [
         name: 'shippingAddress',
         component: ShippingAddressView
     },
+    {
+        path: '/acceptPayment',
+        name: 'AcceptPayment',
+        component: AcceptPaymentView
+    },
+    {
+        path: '/cancelPayment',
+        name: 'CancelPayment',
+        component: CancelPaymentView
+    }
 ]
 
 const router = createRouter({

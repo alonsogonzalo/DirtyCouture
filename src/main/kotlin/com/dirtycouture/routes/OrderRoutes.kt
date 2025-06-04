@@ -8,5 +8,8 @@ fun Route.orderRoutes(){
     route("/api/orders"){
         post("{userId}/{orderId}"){ OrderController.getActuallyOrder(call)}
         get("{userId}"){ OrderController.getAllOrderByIdUser(call)}
+        get("/user") {
+            OrderController.getOrdersWithItems(call)
+        }
     }
 }
