@@ -18,9 +18,7 @@ import ProductList from "../components/ProductList.vue";
         <router-link to="/settings">
           <i class="fas fa-user cursor-pointer hover:text-gray-300"></i>
         </router-link>
-        <router-link to="/cart">
-          <i class="fas fa-shopping-cart cursor-pointer hover:text-gray-300"></i>
-        </router-link>
+        <i class="fas fa-shopping-cart"></i>
       </div>
     </header>
 
