@@ -1,22 +1,45 @@
 <!-- src/views/RegisterView.vue -->
 <template>
-  <div class="register">
-    <h1>Crear cuenta</h1>
-    <form @submit.prevent="handleRegister">
-      <label>Email:</label>
-      <input v-model="email" type="email" required />
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 px-4">
+    <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-sm space-y-6">
+      <h1 class="text-3xl font-extrabold text-center text-gray-900">Crear cuenta</h1>
 
-      <label>Contraseña:</label>
-      <input v-model="password" type="password" required />
+      <form @submit.prevent="handleRegister" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <input
+              v-model="email"
+              type="email"
+              required
+              class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
 
-      <button type="submit">Registrarse</button>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+          <input
+              v-model="password"
+              type="password"
+              required
+              class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
 
-      <p v-if="error" style="color: red">{{ error }}</p>
-    </form>
-    <p>
-      ¿Ya tienes cuenta?
-      <router-link to="/login">Inicia sesión aquí</router-link>
-    </p>
+        <button
+            type="submit"
+            class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition"
+        >
+          Registrarse
+        </button>
+      </form>
+
+      <p class="text-sm text-center text-gray-600">
+        ¿Ya tienes cuenta?
+        <router-link to="/login" class="text-blue-600 hover:underline">Inicia sesión aquí</router-link>
+      </p>
+
+      <p v-if="error" class="text-red-500 text-center text-sm">{{ error }}</p>
+    </div>
   </div>
 </template>
 

@@ -1,25 +1,43 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="bg-white p-6 rounded shadow-md w-full max-w-sm">
-      <h1 class="text-2xl font-bold mb-4 text-center">Login</h1>
-      <form @submit.prevent="handleLogin">
-        <div class="mb-4">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 px-4">
+    <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-sm space-y-6">
+      <h1 class="text-3xl font-extrabold text-center text-gray-900">Iniciar sesión</h1>
+
+      <form @submit.prevent="handleLogin" class="space-y-4">
+        <div>
           <label class="block text-sm font-medium text-gray-700">Email</label>
-          <input v-model="email" type="email" class="mt-1 block w-full border rounded px-3 py-2" required />
+          <input
+              v-model="email"
+              type="email"
+              required
+              class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
         </div>
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700">Password</label>
-          <input v-model="password" type="password" class="mt-1 block w-full border rounded px-3 py-2" required />
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+          <input
+              v-model="password"
+              type="password"
+              required
+              class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
         </div>
-        <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
-          Login
+
+        <button
+            type="submit"
+            class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition"
+        >
+          Entrar
         </button>
       </form>
-      <p>
+
+      <p class="text-sm text-center text-gray-600">
         ¿No tienes cuenta?
-        <router-link to="/register">Regístrate aquí</router-link>
+        <router-link to="/register" class="text-blue-600 hover:underline">Regístrate aquí</router-link>
       </p>
-      <p v-if="error" class="text-red-500 mt-4 text-center">{{ error }}</p>
+
+      <p v-if="error" class="text-red-500 text-center text-sm">{{ error }}</p>
     </div>
   </div>
 </template>
@@ -54,7 +72,7 @@ const handleLogin = async () => {
     userStore.setToken(result.token)
     localStorage.setItem('token', result.token)
     localStorage.setItem('user', JSON.stringify(result.user))
-    router.push('/dashboard')
+    router.push('/')
   } catch (err: any) {
     error.value = err.message
   }
