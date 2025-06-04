@@ -22,12 +22,16 @@ const fetchProducts = async () => {
       console.log(`Producto: ${p.name} | Stock: ${stock}`)
       return {
         ...p,
-        stock
+        stock,
+        fav:false
       }
     })
   }
 }
-
+const fav = (product) => {
+  product.fav = !product.fav
+  console.log(`${product.name} marcado como favorito: ${product.fav}`)
+}
 onMounted(fetchProducts)
 </script>
 
@@ -39,6 +43,10 @@ onMounted(fetchProducts)
         class="relative border rounded-lg p-4 shadow hover:shadow-lg transition"
         :class="{ 'bg-gray-200 opacity-70 pointer-events-none': product.stock === 0 }"
     >
+      <div class="absolute top-4 right-4 text-xl cursor-pointer" @click="fav(product)">
+        <i :class="['fas', product.fav ? 'fa-heart text-red-500' : 'fa-heart text-gray-400']"></i>
+      </div>
+
       <img :src="product.image_url" alt="Imagen del producto" class="w-full h-48 object-cover mb-4 rounded-md" />
       <h3 class="text-xl font-bold mb-2">{{ product.name }}</h3>
       <p class="text-gray-700 mb-2">Precio: €{{ product.price }}</p>
@@ -60,3 +68,7 @@ onMounted(fetchProducts)
     </div>
   </div>
 </template>
+
+<style scoped>
+@import "@fortawesome/fontawesome-free/css/all.min.css";
+</style>
