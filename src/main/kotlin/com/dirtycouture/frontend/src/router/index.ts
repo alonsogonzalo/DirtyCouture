@@ -6,6 +6,7 @@ import DashboardView from '../views/DashboardView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import { useUserStore } from '../stores/userStore'
 import SettingsView from "../views/SettingsView.vue";
+import CartView from "../views/CartView.vue";
 
 const routes = [
     {
@@ -33,6 +34,11 @@ const routes = [
         path: '/settings',
         name: 'settings',
         component: SettingsView
+    },
+    {
+        path: '/cart',
+        name: 'cart',
+        component: CartView
     }
 ]
 

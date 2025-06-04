@@ -55,43 +55,64 @@ object CartController {
 
 
     suspend fun getCartByIdUser(call: ApplicationCall) {
-        val idUser= call.parameters["userId"]?.toLong()
-        if(idUser==null){
-            call.respond(HttpStatusCode.BadRequest, "Empty fields")
+        val userId = call.parameters["userId"]?.toLongOrNull()
+        if (userId == null) {
+            call.respond(HttpStatusCode.BadRequest, mapOf("success" to false, "message" to "Missing userId"))
             return
         }
-        val cardFindByIdUser= DBFactory.dslContext.selectFrom(CartItems.CART_ITEMS)
-            .where(CartItems.CART_ITEMS.USER_ID.eq(idUser))
-            .fetchInto(CartItems::class.java)
 
-        if(cardFindByIdUser.isEmpty()){
-            call.respond(HttpStatusCode.BadRequest, "User don't have cart")
-            return
+        val result = DBFactory.dslContext.select(
+            CartItems.CART_ITEMS.ID,
+            CartItems.CART_ITEMS.PRODUCT_VARIANT_ID,
+            CartItems.CART_ITEMS.QUANTITY,
+            com.dirtycouture.db.generated.tables.ProductVariants.PRODUCT_VARIANTS.SIZE,
+            com.dirtycouture.db.generated.tables.ProductVariants.PRODUCT_VARIANTS.COLOR,
+            com.dirtycouture.db.generated.tables.ProductVariants.PRODUCT_VARIANTS.PRICE,
+            com.dirtycouture.db.generated.tables.Products.PRODUCTS.NAME
+        )
+            .from(CartItems.CART_ITEMS)
+            .join(com.dirtycouture.db.generated.tables.ProductVariants.PRODUCT_VARIANTS)
+            .on(CartItems.CART_ITEMS.PRODUCT_VARIANT_ID.eq(com.dirtycouture.db.generated.tables.ProductVariants.PRODUCT_VARIANTS.ID))
+            .join(com.dirtycouture.db.generated.tables.Products.PRODUCTS)
+            .on(com.dirtycouture.db.generated.tables.ProductVariants.PRODUCT_VARIANTS.PRODUCT_ID.eq(com.dirtycouture.db.generated.tables.Products.PRODUCTS.ID))
+            .where(CartItems.CART_ITEMS.USER_ID.eq(userId))
+            .fetch()
+
+        val cartItems = result.map {
+            mapOf(
+                "cartItemId" to it[CartItems.CART_ITEMS.ID],
+                "variantId" to it[CartItems.CART_ITEMS.PRODUCT_VARIANT_ID],
+                "quantity" to it[CartItems.CART_ITEMS.QUANTITY],
+                "size" to it[com.dirtycouture.db.generated.tables.ProductVariants.PRODUCT_VARIANTS.SIZE],
+                "color" to it[com.dirtycouture.db.generated.tables.ProductVariants.PRODUCT_VARIANTS.COLOR],
+                "price" to it[com.dirtycouture.db.generated.tables.ProductVariants.PRODUCT_VARIANTS.PRICE],
+                "productName" to it[com.dirtycouture.db.generated.tables.Products.PRODUCTS.NAME]
+            )
         }
-        call.respond(cardFindByIdUser);
+
+        call.respond(HttpStatusCode.OK, cartItems)
     }
+
 
     suspend fun deleteVariantOfCard(call: ApplicationCall) {
         val idUser = call.parameters["userId"]?.toLong()
-        val idCart= call.parameters["cartId"]?.toLong()
-        if(idUser==null||idCart==null){
-            call.respond(HttpStatusCode.BadRequest, "Empty fields")
+        val variantId = call.parameters["variantId"]?.toLong()
+        if (idUser == null || variantId == null) {
+            call.respond(HttpStatusCode.BadRequest, mapOf("success" to false, "message" to "Missing parameters"))
             return
         }
-        val cardFind= DBFactory.dslContext.selectFrom(CartItems.CART_ITEMS)
-            .where(CartItems.CART_ITEMS.USER_ID.eq(idUser)
-                .and(CartItems.CART_ITEMS.ID.eq(idCart)))
-            .fetchInto(CartItems::class.java)
-        if(cardFind.isEmpty()){
-            call.respond(HttpStatusCode.BadRequest, "User don't have cart")
-            return
-        }else{
-            DBFactory.dslContext.deleteFrom(CartItems.CART_ITEMS)
-                .where(CartItems.CART_ITEMS.USER_ID.eq(idUser)
-                .and(CartItems.CART_ITEMS.ID.eq(idCart))).execute()
 
-            call.respond(HttpStatusCode.OK, "Cart item deleted successfully")
+        val deleted = DBFactory.dslContext.deleteFrom(CartItems.CART_ITEMS)
+            .where(CartItems.CART_ITEMS.USER_ID.eq(idUser)
+                .and(CartItems.CART_ITEMS.PRODUCT_VARIANT_ID.eq(variantId)))
+            .execute()
+
+        if (deleted > 0) {
+            call.respond(HttpStatusCode.OK, mapOf("success" to true, "message" to "Item removed from cart"))
+        } else {
+            call.respond(HttpStatusCode.NotFound, mapOf("success" to false, "message" to "Item not found in cart"))
         }
     }
+
 
 }
