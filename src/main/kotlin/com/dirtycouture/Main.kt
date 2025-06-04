@@ -16,9 +16,7 @@ import io.ktor.server.response.*
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.plugins.cors.routing.*
-import io.ktor.http.*
 import io.ktor.server.http.content.*
-import io.ktor.server.request.*
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -81,7 +79,8 @@ fun Application.module() {
     }
 
     install(CORS) {
-        anyHost() // ⚠️ En producción usa .host("tudominio.com", schemes = listOf("https"))
+        allowHost("https://dirtycouture.onrender.com/", schemes = listOf("https"))
+        allowCredentials = true
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
         allowMethod(HttpMethod.Get)

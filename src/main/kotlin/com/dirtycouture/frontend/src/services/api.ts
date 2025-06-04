@@ -3,8 +3,10 @@ import axios from 'axios'
 import { useUserStore } from '../stores/userStore'
 
 const api = axios.create({
-    baseURL: 'http://localhost:8080',
+    baseURL: import.meta.env.VITE_API_URL || '', // ← en producción se usa la raíz del mismo dominio
 })
+
+api.defaults.withCredentials = true
 
 api.interceptors.request.use(config => {
     const userStore = useUserStore()
