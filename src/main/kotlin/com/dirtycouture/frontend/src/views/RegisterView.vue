@@ -31,6 +31,9 @@
         >
           Registrarse
         </button>
+        <div>
+        <router-link to="/" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">Volver al incio </router-link>
+          </div>
       </form>
 
       <p class="text-sm text-center text-gray-600">
