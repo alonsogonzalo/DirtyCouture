@@ -1,4 +1,5 @@
 import java.util.*;
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val env = Properties().apply {
     val envFile = file(".env")
@@ -17,7 +18,10 @@ plugins {
     id("io.ktor.plugin") version "2.3.7"
     id("nu.studer.jooq") version "8.2"
     kotlin("plugin.serialization") version "1.9.22"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
+
+tasks.withType<ShadowJar> { isZip64 = true }
 
 group = "com.dirtycouture"
 version = "1.0-SNAPSHOT"
@@ -73,7 +77,6 @@ dependencies {
     testImplementation("io.ktor:ktor-server-tests:2.3.7")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:1.9.22")
 }
-
 
 tasks.test {
     useJUnitPlatform()
