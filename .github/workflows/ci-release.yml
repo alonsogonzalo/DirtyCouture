@@ -28,6 +28,7 @@ jobs:
       - name: Run tests
         run: ./gradlew test
 
+      #Trigger Deploy Hook de Render
       - name: Trigger Render Deploy Hook
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK}}
