@@ -14,6 +14,9 @@ import ProductList from "../components/ProductList.vue";
         <!--<img src="/src/assets/logo.png" alt="DirtyCouture Logo" class="h-10 object-contain" />-->
         <img :src="Logo" alt="DirtyCouture Logo" class="w-60 h-auto object-contain"/>
       </div>
+      <router-link to="/login" class="bg-black text-white px-6 py-3 rounded-2xl shadow-md hover:bg-gray-800 transition">
+        Iniciar sesión
+      </router-link>
       <div class="w-1/3 flex justify-end space-x-4 text-2xl">
         <router-link to="/settings">
           <i class="fas fa-user cursor-pointer hover:text-gray-300"></i>

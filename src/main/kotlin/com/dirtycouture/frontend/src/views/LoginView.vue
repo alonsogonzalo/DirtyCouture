@@ -30,11 +30,15 @@
         >
           Entrar
         </button>
+        <div>
+        <router-link to="/" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">Volver al incio </router-link>
+          </div>
       </form>
 
       <p class="text-sm text-center text-gray-600">
         ¿No tienes cuenta?
         <router-link to="/register" class="text-blue-600 hover:underline">Regístrate aquí</router-link>
+
       </p>
 
       <p v-if="error" class="text-red-500 text-center text-sm">{{ error }}</p>
