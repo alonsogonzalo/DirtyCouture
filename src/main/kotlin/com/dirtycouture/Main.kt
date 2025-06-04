@@ -19,6 +19,7 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.http.*
 import io.ktor.server.http.content.*
 import io.ktor.server.request.*
+import java.io.File
 
 fun main(args: Array<String>) {
     //Carga .env (credenciales DB) antes de iniciar ktor
@@ -110,6 +111,22 @@ fun Application.module() {
             orderRoutes()        // /api/orders/…
             paymentRoutes()      // /api/payments/…
             shippingRoutes()
+        }
+
+        // Rutas frontend: servir recursos estáticos
+        static("/") {
+            resources("frontend/dist")
+            defaultResource("index.html", "frontend/dist")
+        }
+
+        // Catch-all para SPA (opcional, útil si usas Vue Router en modo history)
+        get("{...}") {
+            val indexFile = File("build/resources/main/frontend/dist/index.html")
+            if (indexFile.exists()) {
+                call.respondFile(indexFile)
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
         }
     }
 
