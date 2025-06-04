@@ -20,6 +20,8 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import io.ktor.server.plugins.cors.routing.*
+import io.ktor.http.*
 
 fun main(args: Array<String>) {
     //Carga .env (credenciales DB) antes de iniciar ktor
@@ -76,6 +78,18 @@ fun Application.module() {
     install(ContentNegotiation) {
         json()
     }
+
+    install(CORS) {
+        anyHost() // ⚠️ En producción usa .host("tudominio.com", schemes = listOf("https"))
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Authorization)
+        allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Options)
+    }
+
 
     // 6. Rutas: separamos públicas y protegidas
     routing {

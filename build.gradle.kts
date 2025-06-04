@@ -16,6 +16,7 @@ plugins {
     application //Allow execute with "gradlew run"
     id("io.ktor.plugin") version "2.3.7"
     id("nu.studer.jooq") version "8.2"
+    kotlin("plugin.serialization") version "1.9.22"
 }
 
 group = "com.dirtycouture"
@@ -47,6 +48,9 @@ dependencies {
 
     // JWT (Auth0)
     implementation("com.auth0:java-jwt:4.5.0")
+
+    // CORS
+    implementation("io.ktor:ktor-server-cors:2.3.7")
 
     // HikariCP y JOOQ
     implementation("com.zaxxer:HikariCP:5.1.0")
