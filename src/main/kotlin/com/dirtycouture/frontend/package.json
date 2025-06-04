@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",
+    "@supabase/supabase-js": "^2.49.10",
     "axios": "^1.9.0",
     "pinia": "^3.0.2",
     "vue": "^3.5.13",

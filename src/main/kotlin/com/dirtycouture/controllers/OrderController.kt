@@ -7,8 +7,23 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 
 object OrderController {
-    fun addOrderHome(call: ApplicationCall) {
-
+    suspend fun getActuallyOrder(call: ApplicationCall) {
+        val cardId= call.parameters["cardId"]?.toLong()
+        val userId = call.parameters["userId"]?.toLong()
+        if(cardId==null){
+            call.respond(HttpStatusCode.BadRequest, "Empty fields")
+            return
+        }
+        val cartFind= DBFactory.dslContext.selectFrom(Orders.ORDERS)
+            .where(Orders.ORDERS.USER_ID.eq(userId)
+            //.and(Orders.ORDERS.CARD_ID.eq(card_id))
+            )
+            .fetchInto(Orders::class.java)
+        if(cartFind.isEmpty()){
+            call.respond(HttpStatusCode.BadRequest, "No orders found")
+            return
+        }
+        call.respond(cartFind);
     }
 
     suspend fun getAllOrderByIdUser(call: ApplicationCall) {

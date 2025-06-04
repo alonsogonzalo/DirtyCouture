@@ -1,5 +1,9 @@
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+pluginManagement {
+    repositories {
+        gradlePluginPortal()   // Imprescindible para plugins Kotlin y otros oficiales
+        mavenCentral()
+        google()
+    }
 }
-rootProject.name = "DirtyCouture"
 
+rootProject.name = "DirtyCouture"

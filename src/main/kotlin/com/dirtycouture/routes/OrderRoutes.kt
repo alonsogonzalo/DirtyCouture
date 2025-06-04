@@ -6,7 +6,7 @@ import io.ktor.server.application.*
 
 fun Route.orderRoutes(){
     route("/api/orders"){
-        post("{cardId}"){ OrderController.addOrderHome(call)}
+        post("{userId}/{orderId}"){ OrderController.getActuallyOrder(call)}
         get("{userId}"){ OrderController.getAllOrderByIdUser(call)}
     }
 }
