@@ -13,7 +13,9 @@ import Logo from "../assets/logo.png";
         <img :src="Logo" alt="DirtyCouture Logo" class="w-60 h-auto object-contain"/>
       </div>
       <div class="w-1/3 flex justify-end space-x-4 text-2xl">
-        <i class="fas fa-user"></i>
+        <router-link to="/settings">
+          <i class="fas fa-user cursor-pointer hover:text-gray-300"></i>
+        </router-link>
         <i class="fas fa-shopping-cart"></i>
       </div>
     </header>

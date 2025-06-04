@@ -5,6 +5,7 @@ import LoginView from '../views/LoginView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import { useUserStore } from '../stores/userStore'
+import SettingsView from "../views/SettingsView.vue";
 
 const routes = [
     {
@@ -27,8 +28,12 @@ const routes = [
         path: '/register',
         name: 'register',
         component: RegisterView
+    },
+    {
+        path: '/settings',
+        name: 'settings',
+        component: SettingsView
     }
-
 ]
 
 const router = createRouter({

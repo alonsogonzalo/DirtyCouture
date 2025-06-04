@@ -17,6 +17,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import java.time.OffsetDateTime
 import java.util.*
+import com.dirtycouture.services.USER_ID_KEY
 
 @Serializable
 data class RegisterRequest(
@@ -50,6 +51,12 @@ data class LoginResponse(
     val token: String,
     val user: UserInfo
 )
+
+@Serializable
+data class UpdateUserRequest(val email: String, val role: String)
+
+@Serializable
+data class UpdateUserResponse(val id: Long, val email: String, val role: String)
 
 object AuthController {
     private val env = dotenv { ignoreIfMissing = true }
@@ -187,6 +194,36 @@ object AuthController {
         val userInfo = UserInfo(id = userId, email = email, role = role)
         val loginResponse = LoginResponse(token = token, user = userInfo)
         call.respond(HttpStatusCode.OK, loginResponse)
+    }
+
+    suspend fun updateUser(call: ApplicationCall) {
+        val tokenUserId = call.attributes[USER_ID_KEY] // Lo obtendrás del JWT en el middleware
+
+        val request = try {
+            call.receive<UpdateUserRequest>()
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Formato JSON inválido"))
+            return
+        }
+
+        val updated: UsersRecord? = try {
+            DBFactory.dslContext.update(Users.USERS)
+                .set(Users.USERS.EMAIL, request.email)
+                .set(Users.USERS.ROLE, UserRole.valueOf(request.role))
+                .where(Users.USERS.ID.eq(tokenUserId))
+                .returning()
+                .fetchOneInto(UsersRecord::class.java)
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "No se pudo actualizar el usuario"))
+            return
+        }
+
+        if (updated == null) {
+            call.respond(HttpStatusCode.NotFound, mapOf("error" to "Usuario no encontrado"))
+            return
+        }
+
+        call.respond(UpdateUserResponse(updated.id!!, updated.email!!, updated.role!!.literal))
     }
 
     private fun generateJwtToken(userId: Long, email: String, role: String): String {
