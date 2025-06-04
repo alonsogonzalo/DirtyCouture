@@ -39,7 +39,8 @@ fun Application.module() {
 
 
     // 2. Configuramos Stripe
-    // PaymentController.configureStripe()
+    PaymentController.configureStripe()
+
 
     // 3. Variables JWT desde .env
     val jwtSecret = dotenv {
@@ -77,9 +78,6 @@ fun Application.module() {
         install(ContentNegotiation) {
         json()
     }
-    //Stripe API config
-    PaymentController.configureStripe()
-
 
     install(CORS) {
         anyHost() // ⚠️ En producción usa .host("tudominio.com", schemes = listOf("https"))

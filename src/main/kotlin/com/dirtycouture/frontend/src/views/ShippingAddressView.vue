@@ -10,7 +10,7 @@
       {{ addressStore.error }}
     </div>
 
-    <!-- 2) Lista de direcciones existentes (si hay alguna) -->
+    <!-- 2) Lista de direcciones existentes -->
     <div v-if="!addressStore.loading && addressStore.addresses.length > 0">
       <h2 class="text-xl font-semibold">Tus direcciones guardadas</h2>
       <ul class="space-y-4 mt-4">
@@ -120,17 +120,20 @@
       </form>
     </div>
 
-    <!-- 4) Botón para continuar al próximo paso (Checkout/Pago) -->
+    <!-- 4) Botón para continuar al pago -->
     <div class="text-right mt-6">
       <button
-          @click="proceedToPayment"
-          :disabled="!addressStore.selectedAddressId"
+          @click="handleCheckout"
+          :disabled="!addressStore.selectedAddressId || loading"
           class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
       >
-        Continuar al pago
+        {{ loading ? 'Procesando…' : 'Continuar al pago' }}
       </button>
       <p v-if="!addressStore.selectedAddressId" class="text-sm text-red-500 mt-2">
         Debes seleccionar o añadir una dirección.
+      </p>
+      <p v-if="error" class="text-sm text-red-500 mt-2 text-left">
+        {{ error }}
       </p>
     </div>
   </div>
@@ -141,12 +144,17 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/userStore'
 import { useAddressStore, ShippingAddress } from '../stores/addressStore'
+import { useCartStore } from '../stores/cartStore'
+import api from '../services/api'
 
 const router = useRouter()
 const userStore = useUserStore()
 const addressStore = useAddressStore()
+const cartStore = useCartStore()
 
-// Formulario reactive para añadir dirección
+const loading = ref(false)
+const error = ref('')
+
 const form = ref<Omit<ShippingAddress, 'id' | 'userId' | 'createdAt'>>({
   fullName: '',
   address: '',
@@ -157,24 +165,17 @@ const form = ref<Omit<ShippingAddress, 'id' | 'userId' | 'createdAt'>>({
   phoneNumber: ''
 })
 
-// Al montar el componente, cargamos las direcciones si el usuario está logueado
 onMounted(() => {
   if (!userStore.user) {
-    // Si no hay sesión, redirigir al login
     router.push('/login')
     return
   }
-  // Obtener todas las direcciones del usuario
   addressStore.fetchAddresses(userStore.user.id)
 })
 
-/**
- * Al enviar el formulario, llamamos a addressStore.addAddress()
- * que automáticamente vuelve a cargar la lista y marca la recién creada.
- */
 async function handleAddAddress() {
   if (!userStore.user) return
-  addressStore.addAddress({
+  await addressStore.addAddress({
     fullName: form.value.fullName,
     address: form.value.address,
     city: form.value.city,
@@ -184,7 +185,6 @@ async function handleAddAddress() {
     phoneNumber: form.value.phoneNumber
   })
 
-  // Limpiamos el formulario tras intentar guardar (opcional)
   form.value.fullName = ''
   form.value.address = ''
   form.value.city = ''
@@ -194,23 +194,32 @@ async function handleAddAddress() {
   form.value.phoneNumber = ''
 }
 
-/**
- * Al pulsar “Continuar al pago”, verificamos que haya una dirección seleccionada
- * y navegamos a la siguiente vista (por ej. /checkout/payment).
- */
-function proceedToPayment() {
-  if (!addressStore.selectedAddressId || !userStore.user) {
-    return
+async function handleCheckout() {
+  if (!userStore.user || !addressStore.selectedAddressId) return
+
+  loading.value = true
+  error.value = ''
+
+  try {
+    const response = await api.post('/api/payment/create-checkout-session', {
+      shippingAddressId: addressStore.selectedAddressId
+    })
+
+    const { stripeUrl } = response.data as {
+      orderId: number
+      stripeUrl: string
+    }
+
+    cartStore.clearCart()
+    window.location.href = stripeUrl
+  } catch (err: any) {
+    console.error('Error en checkout:', err)
+    error.value = err.response?.data?.error || 'Error al procesar el pago.'
+    loading.value = false
   }
-  // Guardamos la dirección seleccionada en el store (puede usarse luego)
-  // O bien pasamos como query param: ?shippingId=addressStore.selectedAddressId
-  router.push({
-    name: 'CheckoutPayment',
-    query: { shippingId: addressStore.selectedAddressId.toString() }
-  })
 }
 </script>
 
 <style scoped>
-/* Si quieres estilos adicionales, agrégalos aquí */
+/* Puedes añadir estilos adicionales aquí si los necesitas */
 </style>
