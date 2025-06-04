@@ -79,8 +79,7 @@ fun Application.module() {
     }
 
     install(CORS) {
-        allowHost("https://dirtycouture.onrender.com/", schemes = listOf("https"))
-        allowCredentials = true
+        allowHost("dirtycouture.onrender.com", schemes = listOf("https"))
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
         allowMethod(HttpMethod.Get)
@@ -88,8 +87,8 @@ fun Application.module() {
         allowMethod(HttpMethod.Put)
         allowMethod(HttpMethod.Delete)
         allowMethod(HttpMethod.Options)
+        allowCredentials = true
     }
-
 
     // 6. Rutas: separamos públicas y protegidas
     routing {
