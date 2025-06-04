@@ -1,5 +1,7 @@
 <script setup>
 import Logo from "../assets/logo.png";
+import AddProduct  from "../components/AddProduct.vue";
+import ProductList from "../components/ProductList.vue";
 </script>
 
 <template>
@@ -12,9 +14,18 @@ import Logo from "../assets/logo.png";
         <!--<img src="/src/assets/logo.png" alt="DirtyCouture Logo" class="h-10 object-contain" />-->
         <img :src="Logo" alt="DirtyCouture Logo" class="w-60 h-auto object-contain"/>
       </div>
+
+
       <div class="w-1/3 flex justify-end space-x-4 text-2xl">
-        <i class="fas fa-user"></i>
+        <router-link to="/login" class="bg-black text-white text-base px-4 py-2 rounded-xl shadow hover:bg-gray-800 transition">
+          Iniciar sesión
+        </router-link>
+        <router-link to="/settings">
+          <i class="fas fa-user cursor-pointer hover:text-gray-300"></i>
+        </router-link>
+        <router-link to="/dashboard">
         <i class="fas fa-shopping-cart"></i>
+        </router-link>
       </div>
     </header>
 
@@ -22,30 +33,14 @@ import Logo from "../assets/logo.png";
     <main class="p-6 max-w-6xl mx-auto flex-grow">
       <h1 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">Nuestros productos</h1>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center">
-          <img src="https://via.placeholder.com/150" class="mb-4 rounded-md" />
-          <h2 class="text-lg font-semibold">Sudadera Negra</h2>
-          <p class="text-sm text-gray-500">€45.00</p>
-        </div>
+      <!-- <AddProduct />-->
+      <ProductList />
 
-        <div class="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center">
-          <img src="https://via.placeholder.com/150" class="mb-4 rounded-md" />
-          <h2 class="text-lg font-semibold">Camiseta Blanca</h2>
-          <p class="text-sm text-gray-500">€25.00</p>
-        </div>
-
-        <div class="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center">
-          <img src="https://via.placeholder.com/150" class="mb-4 rounded-md" />
-          <h2 class="text-lg font-semibold">Pantalones Cargo</h2>
-          <p class="text-sm text-gray-500">€60.00</p>
-        </div>
-      </div>
     </main>
 
     <!-- Footer -->
     <footer class="bg-red-600 text-white h-24 w-full rounded-t-xl flex items-center justify-center space-x-12">
-      <span>Diego Alcoba Arias</span>
+      <span>Diego Alcoba Arias prueba</span>
       <span>Gonzalo Alonso Olaiz</span>
       <span>Diego Cisneros Morales</span>
     </footer>

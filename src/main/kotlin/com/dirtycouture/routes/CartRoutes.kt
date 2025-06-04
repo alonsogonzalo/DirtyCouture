@@ -6,8 +6,8 @@ import io.ktor.server.application.*
 
 fun Route.cartRoutes(){
     route("/api/cart"){
-        post("{variantId}"){CartController.addVariantToCard(call)}
+        post("/add/{userId}/{variantId}"){CartController.addVariantToCard(call)}
         get("{userId}"){CartController.getCartByIdUser(call)}
-        delete("{userId}/{variantId}"){CartController.deleteVariantOfCard(call)}
+        delete("/delete/{userId}/{cartId}"){CartController.deleteVariantOfCard(call)}
     }
 }

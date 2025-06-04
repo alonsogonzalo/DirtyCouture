@@ -1,8 +1,6 @@
 <template>
-  <div class="min-h-screen bg-black-100 text-black">
-    <router-view />
-  </div>
+  <router-view />
 </template>
 
-<script setup lang="ts">
+<script setup>
 </script>
