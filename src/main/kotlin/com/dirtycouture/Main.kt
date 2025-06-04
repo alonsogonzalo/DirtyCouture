@@ -24,6 +24,7 @@ fun main(args: Array<String>) {
         ignoreIfMissing = true //Por si ya están definidas en produccion (Github y Render credentials)
     }
 
+
     embeddedServer(Netty,
         port = dotenv["PORT"]?.toInt() ?: 8080,
         module = Application::module).start(wait = true)
@@ -92,21 +93,35 @@ fun Application.module() {
 
     // 6. Rutas: separamos públicas y protegidas
     routing {
-        // Rutas públicas (no requieren token)
+        get("/ping") {
+            call.respondText("pong")
+        }
+
+        // Rutas estáticas y SPA
+        staticResources("/", "frontend.dist")
+
+        get("{...}") {
+            call.respondText(
+                this::class.java.classLoader.getResource("frontend.dist/index.html")!!.readText(),
+                ContentType.Text.Html
+            )
+        }
+
+        // Rutas públicas
         authRoutes()    // /auth/register y /auth/login
         productRoutes() // /api/products, /api/products/{id}/variants
 
-        // Rutas protegidas (requieren JWT válido)
-        authenticate("auth-jwt") {
-          cartRoutes()
-          notificationRoutes()
-          orderRoutes()
-          paymentRoutes()
-          webhookRoutes()
-        }
+        // Webhook de Stripe (no requiere autenticación)
+        webhookRoutes()
 
-        // Webhook de Stripe no requiere JWT
-       // webhookRoutes()
+        // Rutas protegidas con JWT
+        authenticate("auth-jwt") {
+            cartRoutes()
+            notificationRoutes()
+            orderRoutes()
+            paymentRoutes()
+        }
+    }
 
     }
 
