@@ -54,6 +54,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/userStore'
+import api from '../services/api'
 
 const email = ref('')
 const password = ref('')
@@ -67,25 +68,20 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
-    const response = await fetch('http://localhost:8080/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.value, password: password.value })
+    const response = await api.post('/auth/login', {
+      email: email.value,
+      password: password.value
     })
 
-    const result = await response.json()
-    console.log('Login response:', result)
-
-    if (!response.ok) {
-      throw new Error(result.error || 'Login fallido')
-    }
+    const result = response.data
 
     userStore.setUser(result.user)
     userStore.setToken(result.token)
 
-    router.push('/') // Redirigir al home, o a /dashboard si lo prefieres
+    router.push('/')
   } catch (err: any) {
-    error.value = err.message
+    console.error(err)
+    error.value = err.response?.data?.error || 'Login fallido'
   } finally {
     loading.value = false
   }

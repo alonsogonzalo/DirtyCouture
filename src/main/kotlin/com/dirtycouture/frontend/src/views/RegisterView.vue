@@ -1,4 +1,3 @@
-<!-- src/views/RegisterView.vue -->
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 px-4">
     <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-sm space-y-6">
@@ -32,8 +31,13 @@
           Registrarse
         </button>
         <div>
-        <router-link to="/" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">Volver al incio </router-link>
-          </div>
+          <router-link
+              to="/"
+              class="w-full block text-center bg-gray-300 text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-400 transition mt-2"
+          >
+            Volver al inicio
+          </router-link>
+        </div>
       </form>
 
       <p class="text-sm text-center text-gray-600">
@@ -49,6 +53,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import api from '../services/api'
 
 const email = ref('')
 const password = ref('')
@@ -58,22 +63,20 @@ const router = useRouter()
 async function handleRegister() {
   error.value = ''
   try {
-    const response = await fetch('http://localhost:8080/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.value, password: password.value })
+    const response = await api.post('/auth/register', {
+      email: email.value,
+      password: password.value
     })
 
-    if (!response.ok) {
-      const res = await response.json()
-      error.value = res.error || 'Error en el registro'
+    if (response.status !== 200 && response.status !== 201) {
+      error.value = response.data?.error || 'Error en el registro'
       return
     }
 
-    // Registro exitoso, redirige al login
     router.push('/login')
-  } catch (err) {
-    error.value = 'Error de red o servidor'
+  } catch (err: any) {
+    console.error(err)
+    error.value = err.response?.data?.error || 'Error de red o servidor'
   }
 }
 </script>
