@@ -11,5 +11,4 @@
 </template>
 
 <script setup lang="ts">
-// No necesitas lógica adicional por ahora
 </script>
