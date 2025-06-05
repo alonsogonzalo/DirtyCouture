@@ -28,6 +28,11 @@ export const useUserStore = defineStore('user', {
                 this.token = token
                 this.user = JSON.parse(user)
             }
+        },
+        clearUser() {
+            user.value = null
+            token.value = null
         }
-    }
+
+}
 })

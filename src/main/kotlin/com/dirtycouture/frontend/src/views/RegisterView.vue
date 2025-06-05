@@ -33,7 +33,7 @@
         <div>
           <router-link
               to="/"
-              class="w-full block text-center bg-gray-300 text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-400 transition mt-2"
+              class="block w-full text-center bg-gray-300 text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-400 transition"
           >
             Volver al inicio
           </router-link>
