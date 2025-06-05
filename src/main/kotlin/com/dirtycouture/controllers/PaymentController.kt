@@ -133,7 +133,7 @@ object PaymentController {
             }
         }
 
-        val frontendUrl = System.getenv("FRONTEND_URL") ?: "http://localhost:5173"
+        val frontendUrl = System.getenv("FRONTEND_URL") ?: "/"
         val session = Session.create(
             SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)

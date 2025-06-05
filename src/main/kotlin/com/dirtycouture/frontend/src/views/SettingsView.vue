@@ -77,6 +77,15 @@
         </div>
       </div>
     </div>
+    <!-- Botón de cerrar sesión -->
+    <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+      <button
+          @click="logout"
+          class="w-full bg-red-600 text-white font-semibold py-2 rounded-lg hover:bg-red-700 transition"
+      >
+        Cerrar sesión
+      </button>
+    </div>
   </div>
 </template>
 
@@ -173,6 +182,11 @@ function mapStatus(code: number): string {
 function mapPayment(status: string): string {
   return status === 'completed' ? 'Completado' : 'Pendiente'
 }
+function logout() {
+  userStore.clearUser()
+  router.push('/login')
+}
+
 </script>
 
 <style scoped>
