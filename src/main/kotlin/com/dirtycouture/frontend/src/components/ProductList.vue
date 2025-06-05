@@ -154,17 +154,65 @@ const fetchProducts = async () => {
 
   if (error) {
     console.error('Error fetching products:', error)
-  } else {
-    products.value = data.map((p) => ({
-      ...p,
-      stock: p.product_variants.reduce((acc, v) => acc + (v.stock || 0), 0),
-      fav: false,
-    }))
+    return
   }
+
+  const userId = userStore.user?.id
+  let wishlistIds = []
+
+  if (userId) {
+    const { data: wishlist, error: wishlistError } = await supabase
+        .from('wishlist_items')
+        .select('product_variant_id')
+        .eq('user_id', userId)
+
+    if (wishlistError) {
+      console.error('Error fetching wishlist:', wishlistError)
+    } else {
+      wishlistIds = wishlist.map(item => item.product_variant_id)
+    }
+  }
+
+  products.value = data.map((p) => ({
+    ...p,
+    stock: p.product_variants.reduce((acc, v) => acc + (v.stock || 0), 0),
+    fav: wishlistIds.includes(p.id), 
+  }))
 }
 
-const fav = (product) => {
+
+const fav = async (product) => {
   product.fav = !product.fav
+
+  const userId = userStore.user?.id
+  if (!userId) {
+    alert('Debes iniciar sesión para guardar favoritos.')
+    return
+  }
+
+  try {
+    if (product.fav) {
+      // Insertar en wishlist_items
+      const { error } = await supabase
+          .from('wishlist_items')
+          .insert([
+            { user_id: userId, product_variant_id: product.id }
+          ])
+
+      if (error) throw error
+    } else {
+      // Eliminar de wishlist_items
+      const { error } = await supabase
+          .from('wishlist_items')
+          .delete()
+          .eq('user_id', userId)
+          .eq('product_variant_id', product.id)
+
+      if (error) throw error
+    }
+  } catch (err) {
+    console.error('Error al actualizar favoritos:', err)
+  }
 }
 
 onMounted(fetchProducts)

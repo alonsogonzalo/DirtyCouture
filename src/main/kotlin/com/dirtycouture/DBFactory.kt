@@ -12,6 +12,10 @@ object DBFactory {
     lateinit var dslContext: DSLContext
 
     fun init() {
+        if(::hikariDataSource.isInitialized) {
+            return
+        }
+
         val dotenv = dotenv {
             ignoreIfMissing = true
         }
