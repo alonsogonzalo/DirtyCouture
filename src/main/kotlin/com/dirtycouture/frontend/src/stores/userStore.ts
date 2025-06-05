@@ -30,9 +30,12 @@ export const useUserStore = defineStore('user', {
             }
         },
         clearUser() {
-            user.value = null
-            token.value = null
+            this.user = null
+            this.token = ''
+            localStorage.removeItem('token')
+            localStorage.removeItem('user')
         }
+
 
 }
 })
