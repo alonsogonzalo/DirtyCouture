@@ -5,7 +5,7 @@ import com.dirtycouture.controllers.ProductController
 import io.ktor.server.application.*
 
 fun Route.productRoutes(){
-    route("/api/products"){
+    route("/products"){
         get(""){ProductController.getAll(call)}
         get("{id}"){ ProductController.getById(call)}
         get("{id}/variants"){ProductController.getVariants(call)}

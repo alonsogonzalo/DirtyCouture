@@ -5,7 +5,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.application.*
 
 fun Route.webhookRoutes() {
-    route("/api/stripe") {
+    route("/stripe") {
         post("/webhook") {
             WebhookController.handleWebhook(call)
         }

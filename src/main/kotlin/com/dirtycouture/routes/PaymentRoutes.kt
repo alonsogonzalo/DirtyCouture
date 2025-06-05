@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.de.undercouch.gradle.tasks.download.org.apache.http.
  * - El webhook (no se muestra aquí) NO requeriría JWT.
  */
 fun Route.paymentRoutes() {
-    route("/api/payment") {
+    route("/payment") {
         authenticate("auth-jwt") {
             // POST /api/payment/create-checkout-session
             post("/create-checkout-session") {

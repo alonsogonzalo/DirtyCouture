@@ -129,7 +129,7 @@ const confirmAddToCart = async () => {
   }
 
   try {
-    const response = await fetch(`http://localhost:8080/api/cart/add/${userId}/${variantId}`, {
+    const response = await fetch(`http://localhost:8080/cart/add/${userId}/${variantId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
