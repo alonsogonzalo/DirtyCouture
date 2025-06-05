@@ -6,7 +6,7 @@ import com.dirtycouture.controllers.ShippingController
 import io.ktor.server.auth.*
 
 fun Route.shippingRoutes() {
-    route("/api/shipping") {
+    route("/shipping") {
         // GET /api/shipping/{userId}
         get("/{userId}") {
             ShippingController.getUserAddresses(call)

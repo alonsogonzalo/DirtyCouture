@@ -79,7 +79,8 @@ fun Application.module() {
     }
 
     install(CORS) {
-        allowHost("dirtycouture.onrender.com", schemes = listOf("https"))
+        allowHost("localhost:5173", schemes = listOf("http")) // desarrollo
+        allowHost("dirtycouture.onrender.com", schemes = listOf("https")) // producción
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
         allowMethod(HttpMethod.Get)

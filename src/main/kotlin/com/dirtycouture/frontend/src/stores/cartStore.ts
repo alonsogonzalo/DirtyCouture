@@ -13,7 +13,7 @@ export const useCartStore = defineStore('cart', {
          */
         async fetchCart(userId: number) {
             try {
-                const response = await api.get(`/api/cart/${userId}`)
+                const response = await api.get(`/cart/${userId}`)
                 console.log('RESPUESTA CART:', response.data) // <-- Depuración
                 this.cartItems = Array.isArray(response.data) ? response.data : []
             } catch (err) {
@@ -28,7 +28,7 @@ export const useCartStore = defineStore('cart', {
          */
         async removeFromCart(userId: number, variantId: number) {
             try {
-                await api.delete(`/api/cart/delete/${userId}/${variantId}`)
+                await api.delete(`/cart/delete/${userId}/${variantId}`)
                 await this.fetchCart(userId)
             } catch (err) {
                 console.error('Error removing from cart:', err)
@@ -41,7 +41,7 @@ export const useCartStore = defineStore('cart', {
          */
         async clearCartFromBackend(userId: number) {
             try {
-                await api.delete(`/api/cart/clear/${userId}`)
+                await api.delete(`/cart/clear/${userId}`)
                 await this.fetchCart(userId)
             } catch (err) {
                 console.error('Error clearing cart:', err)
@@ -54,7 +54,7 @@ export const useCartStore = defineStore('cart', {
          */
         async addToCart(userId: number, variantId: number) {
             try {
-                await api.post(`/api/cart/add/${userId}/${variantId}`)
+                await api.post(`/cart/add/${userId}/${variantId}`)
                 await this.fetchCart(userId)
             } catch (err) {
                 console.error('Error adding to cart:', err)

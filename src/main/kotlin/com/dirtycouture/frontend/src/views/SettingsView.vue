@@ -1,75 +1,46 @@
 <template>
   <div class="min-h-screen flex flex-col items-center bg-gray-100 p-6 space-y-8">
-    <!-- Contenedor principal -->
+    <!-- Configuración de usuario -->
     <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
-      <!-- Título y formulario de usuario -->
       <h1 class="text-2xl font-bold mb-6 text-center">Configuración de usuario</h1>
       <form @submit.prevent="handleUpdateUser" class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
-          <input
-              v-model="email"
-              type="email"
-              required
-              class="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
+          <input v-model="email" type="email" required class="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Rol</label>
-          <select
-              v-model="role"
-              required
-              class="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
+          <select v-model="role" required class="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
             <option value="User">User</option>
             <option value="Admin">Admin</option>
           </select>
         </div>
 
-        <button
-            type="submit"
-            :disabled="updatingUser"
-            class="w-full bg-green-600 text-white font-semibold py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition"
-        >
+        <button type="submit" :disabled="updatingUser" class="w-full bg-green-600 text-white font-semibold py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition">
           {{ updatingUser ? 'Guardando...' : 'Guardar cambios' }}
         </button>
 
-        <p v-if="successMessage" class="text-green-600 text-sm text-center mt-2">
-          {{ successMessage }}
-        </p>
+        <p v-if="successMessage" class="text-green-600 text-sm text-center mt-2">{{ successMessage }}</p>
       </form>
     </div>
 
-    <!-- Bloque de direcciones -->
+    <!-- Direcciones -->
     <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-3xl">
       <h2 class="text-xl font-semibold mb-4">Tus direcciones guardadas</h2>
 
-      <div v-if="addressStore.loading" class="text-center text-gray-500 mb-4">
-        Cargando direcciones…
-      </div>
-      <div v-if="addressStore.error" class="text-red-500 text-center mb-4">
-        {{ addressStore.error }}
-      </div>
+      <div v-if="addressStore.loading" class="text-center text-gray-500 mb-4">Cargando direcciones…</div>
+      <div v-if="addressStore.error" class="text-red-500 text-center mb-4">{{ addressStore.error }}</div>
 
       <ul v-if="!addressStore.loading && addressStore.addresses.length > 0" class="space-y-4">
-        <li
-            v-for="addr in addressStore.addresses"
-            :key="addr.id"
-            class="flex items-center justify-between border p-4 rounded-lg"
-        >
+        <li v-for="addr in addressStore.addresses" :key="addr.id" class="flex items-center justify-between border p-4 rounded-lg">
           <div>
             <p class="font-semibold">{{ addr.fullName }}</p>
             <p>{{ addr.address }}, {{ addr.city }}, {{ addr.state }}, {{ addr.zipCode }}, {{ addr.country }}</p>
             <p class="text-sm text-gray-500">Tel: {{ addr.phoneNumber }}</p>
             <p class="text-xs text-gray-400 mt-1">Guardada: {{ formatDate(addr.createdAt) }}</p>
           </div>
-          <button
-              @click="confirmDelete(addr.id)"
-              class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-          >
-            Borrar
-          </button>
+          <button @click="confirmDelete(addr.id)" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">Borrar</button>
         </li>
       </ul>
 
@@ -78,7 +49,7 @@
       </div>
     </div>
 
-    <!-- Bloque de pedidos -->
+    <!-- Pedidos -->
     <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-3xl">
       <h2 class="text-xl font-semibold mb-4">Tus pedidos</h2>
 
@@ -114,7 +85,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/userStore'
 import { useAddressStore } from '../stores/addressStore'
-import axios from 'axios'
+import api from '../services/api' // ✅ usamos la instancia correcta
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -148,18 +119,12 @@ async function handleUpdateUser() {
   successMessage.value = ''
 
   try {
-    const response = await fetch(`http://localhost:8080/api/users/${userStore.user.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${userStore.token}`
-      },
-      body: JSON.stringify({ email: email.value, role: role.value })
+    const response = await api.put('/auth/update', {
+      email: email.value,
+      role: role.value
     })
 
-    const result = await response.json()
-    if (!response.ok) throw new Error(result.error || 'Error al actualizar usuario')
-
+    const result = response.data
     userStore.setUser({ id: userStore.user.id, email: result.email, role: result.role })
     successMessage.value = 'Datos actualizados correctamente.'
     setTimeout(() => (successMessage.value = ''), 3000)
@@ -174,11 +139,7 @@ async function handleUpdateUser() {
 
 async function fetchOrders() {
   try {
-    const res = await axios.get('http://localhost:8080/api/orders/user', {
-      headers: {
-        Authorization: `Bearer ${userStore.token}`
-      }
-    })
+    const res = await api.get('/orders/user') // ✅ ahora usa baseURL y token correctamente
     orders.value = res.data
   } catch (err) {
     console.error('Error al cargar pedidos:', err)

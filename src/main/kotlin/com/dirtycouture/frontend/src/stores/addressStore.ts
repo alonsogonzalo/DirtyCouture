@@ -33,7 +33,7 @@ export const useAddressStore = defineStore('address', {
             this.loading = true
             this.error = ''
             try {
-                const response = await api.get<ShippingAddress[]>(`/api/shipping/${userId}`)
+                const response = await api.get<ShippingAddress[]>(`/shipping/${userId}`)
                 this.addresses = Array.isArray(response.data) ? response.data : []
             } catch (err: any) {
                 console.error('Error fetching addresses:', err)
@@ -51,12 +51,16 @@ export const useAddressStore = defineStore('address', {
             this.loading = true
             this.error = ''
             try {
-                const response = await api.post<ShippingAddress>('/api/shipping', newAddress)
+                const response = await api.post<ShippingAddress>('/shipping', newAddress)
                 const created: ShippingAddress = response.data
                 this.addresses.push(created)
                 this.selectedAddressId = created.id
             } catch (err: any) {
-                console.error('Error adding address:', err)
+                if (err.response) {
+                    console.error('Error adding address:', err.response.status, err.response.data)
+                } else {
+                    console.error('Error adding address:', err)
+                }
                 this.error = err.response?.data?.error || 'Error adding address'
             } finally {
                 this.loading = false
@@ -70,7 +74,7 @@ export const useAddressStore = defineStore('address', {
             this.loading = true
             this.error = ''
             try {
-                await api.delete(`/api/shipping/${addressId}`)
+                await api.delete(`/shipping/${addressId}`)
                 // Después de borrar, recargamos la lista de direcciones
                 await this.fetchAddresses(userId)
             } catch (err: any) {

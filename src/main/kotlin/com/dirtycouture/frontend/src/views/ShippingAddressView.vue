@@ -201,7 +201,7 @@ async function handleCheckout() {
   error.value = ''
 
   try {
-    const response = await api.post('/api/payment/create-checkout-session', {
+    const response = await api.post('/payment/create-checkout-session', {
       shippingAddressId: addressStore.selectedAddressId
     })
 
